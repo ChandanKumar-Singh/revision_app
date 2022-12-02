@@ -6,7 +6,10 @@ import 'package:api_cache_manager/api_cache_manager.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -23,6 +26,102 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 
 import 'constants/widgets.dart';
+
+///FCM
+FirebaseMessaging messaging = FirebaseMessaging.instance;
+String fcmWebServerKey =
+    'AAAAUpjhLsk:APA91bGmCC8UZOsc9BPjjHceQaJIce-6ahoOXCT6b5uTuUZQIlaS4FB1s7FQrjkDb4m-Q68YBlKbZ9JCuTIspoQ3-QmG_YvyC8g9X0VID5m4dUEzbPYMycys3uVKEVuq77QaupJRQZgj';
+
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+FlutterLocalNotificationsPlugin();
+
+Future<void> setupFCM() async {
+  NotificationSettings settings = await messaging.requestPermission(
+    alert: true,
+    announcement: true,
+    badge: true,
+    carPlay: false,
+    criticalAlert: true,
+    provisional: false,
+    sound: true,
+  );
+  await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+    alert: true, // Required to display a heads up notification
+    badge: true,
+    sound: true,
+  );
+  if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+    print('User granted permission');
+  } else if (settings.authorizationStatus == AuthorizationStatus.provisional) {
+    print('User granted provisional permission');
+  } else {
+    print('User declined or has not accepted permission');
+  }
+}
+
+Future<void> initFCM() async {
+  ///initialMessage
+  RemoteMessage? initialMessage =
+      await FirebaseMessaging.instance.getInitialMessage();
+  if (initialMessage != null) {
+    print('initialMessage -------> $initialMessage');
+  }
+
+  ///onMessageOpenedApp
+
+  FirebaseMessaging.onMessageOpenedApp
+      .listen((message) => print('initialMessage -------> $message'));
+
+  ///onMessage
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+    print('Got a message whilst in the foreground!');
+    print('Message data: ${message.data}');
+
+    if (message.notification != null) {
+      print('Message also contained a notification: ${message.notification}');
+    }
+    const AndroidNotificationChannel channel = AndroidNotificationChannel(
+      'high_importance_channel', // id
+      'High Importance Notifications', // title
+      description:
+          'This channel is used for important notifications.', // description
+      importance: Importance.max,
+    );
+
+    await flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(channel);
+    RemoteNotification? notification = message.notification;
+    AndroidNotification? android = message.notification?.android;
+    if (notification != null && android != null) {
+      flutterLocalNotificationsPlugin.show(
+          notification.hashCode,
+          notification.title,
+          notification.body,
+          NotificationDetails(
+            android: AndroidNotificationDetails(
+              channel.id,
+              channel.name,
+              channelDescription: channel.description,
+              icon: android.smallIcon,
+            ),
+          ));
+    }
+  });
+
+  ///getToken
+  String? token = await messaging.getToken(
+      // vapidKey: fcmWebServerKey,
+      );
+
+  print('Fcm deviceToken is: ${token}');
+}
+
+
+Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  print("Handling a background message: ${message.messageId}");
+}
 
 Route slideUpRoute(Widget page) {
   return PageRouteBuilder(
@@ -62,7 +161,6 @@ late SharedPreferences prefs;
 var downloadedProfileImagePath = '';
 late String appTempPath;
 FirebaseAuth auth = FirebaseAuth.instance;
-
 
 void connectionSetup() async {
   var connection = await Connectivity().checkConnectivity();
@@ -182,12 +280,11 @@ void showShortSheetActions(
             borderRadius: BorderRadius.circular(radius ?? 10),
             boxShadow: [
               BoxShadow(
-                color: Get.theme.primaryColor.withOpacity(0.6),
-                // color:Colors.red,
-                offset: Offset(1, 1),
-                blurRadius: 15,
-                spreadRadius: 10
-              ),
+                  color: Get.theme.primaryColor.withOpacity(0.6),
+                  // color:Colors.red,
+                  offset: Offset(1, 1),
+                  blurRadius: 15,
+                  spreadRadius: 10),
             ],
             color:
                 color ?? Color(Get.theme.indicatorColor.value).withOpacity(0.7),

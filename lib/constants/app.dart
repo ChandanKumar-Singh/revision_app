@@ -16,15 +16,15 @@ class App{
   static const Color themecolor=Color(0xFF3b98c8);
   static const Color themecolor2=Color(0xFF211862);
   static const Color themecolor3=Color(0xFF473c42);
-  static const Color themecolor4=Color(0xFFa4c982);
+  static const Color themecolor4=Color(0xFFb7ce72);
   static const Color themecolor5=Color(0xFF64a1ce);
 
 
   static const int swatchCode=   0xFF211862 ;
-  static const int swatchCode2=   0xFFa4c982 ;
+  static const int swatchCode2=   0xFFb7ce72 ;
   static const int swatchCode3=   0xFF64a1ce ;
 
-  static const String appname='Revision Infra-estate Private Limited';
+  static const String appname='Revesion Infra-estate Private Limited';
   static const String applogo='assets/app/logo1.png';
 
 

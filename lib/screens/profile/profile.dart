@@ -25,186 +25,295 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Consumer<UserProvider>(builder: (context, up, _) {
-      print(Get.theme.textTheme.headline6!.fontFamily);
       double profileValue =
           (up.recommendedBio.where((element) => element.text != '').length /
               up.recommendedBio.length);
-      print(MediaQuery.of(context).viewInsets.bottom);
 
       return Scaffold(
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: Column(
-            children: [
-              Column(children: [
-                const SizedBox(height: kToolbarHeight / 2),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Column(
+              children: [
+                Column(
                   children: [
-                    IconButton(
-                        onPressed: () {
-                          Get.back();
-                        },
-                        icon: const Icon(Icons.arrow_back_ios)),
-                    IconButton(
-                        onPressed: () {
-                          Provider.of<ThemeProvider>(context, listen: false)
-                              .toogleBrt();
-                          Timer(const Duration(milliseconds: 500), () {
-                            setState(() {});
-                          });
-                        },
-                        icon: const Icon(Icons.settings_outlined)),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                            onPressed: () {
+                              Get.back();
+                            },
+                            icon: const Icon(Icons.arrow_back_ios)),
+                        IconButton(
+                            onPressed: () {
+                              Provider.of<ThemeProvider>(context, listen: false)
+                                  .toogleBrt();
+                              Timer(const Duration(milliseconds: 500), () {
+                                setState(() {});
+                              });
+                            },
+                            icon: Icon(
+                              Theme.of(context).brightness == Brightness.dark
+                                  ? Icons.dark_mode
+                                  : Icons.light_mode,
+                            )),
+                      ],
+                    ),
                   ],
                 ),
-              ],),
-              SizedBox(height: 10),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                     
-                      Stack(
-                        children: [
-                          Stack(
-                            children: [
-                              CircleAvatar(
-                                backgroundColor: Get.theme.colorScheme.primary,
-                                radius: kToolbarHeight,
-                                child: CircleAvatar(
-                                  backgroundColor: Get.theme.primaryColor,
-                                  radius: kToolbarHeight - 2,
-                                  backgroundImage: up.associate.data!.image != null &&
-                                          up.associate.data!.image != ''
-                                      ? FileImage(File(
-                                          '$appTempPath/${up.associate.data!.image!.split('/').last}'))
-                                      : const AssetImage('assets/user.png')
-                                          as ImageProvider,
-                                ),
-                              ),
-                              if (up.uploadingImage)
-                                Positioned.fill(
-                                  child: LoadingBouncingGrid.square(
-                                    borderColor: Get.theme.colorScheme.primary,
-                                    borderSize: 3.0,
-                                    size: 30.0,
-                                    inverted: false,
-                                    backgroundColor: Colors.white,
-                                    duration: const Duration(milliseconds: 2000),
+                const SizedBox(height: 10),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        Stack(
+                          children: [
+                            Stack(
+                              children: [
+                                CircleAvatar(
+                                  backgroundColor:
+                                      Get.theme.colorScheme.primary,
+                                  radius: kToolbarHeight,
+                                  child: CircleAvatar(
+                                    backgroundColor: Get.theme.primaryColor,
+                                    radius: kToolbarHeight - 2,
+                                    backgroundImage: up.associate.data!.image !=
+                                                null &&
+                                            up.associate.data!.image != ''
+                                        ? FileImage(File(
+                                            '$appTempPath/${up.associate.data!.image!.split('/').last}'))
+                                        : const AssetImage('assets/user.png')
+                                            as ImageProvider,
                                   ),
                                 ),
-                            ],
+                                if (up.uploadingImage)
+                                  Positioned.fill(
+                                    child: LoadingBouncingGrid.square(
+                                      borderColor:
+                                          Get.theme.colorScheme.primary,
+                                      borderSize: 3.0,
+                                      size: 30.0,
+                                      inverted: false,
+                                      backgroundColor: Colors.white,
+                                      duration:
+                                          const Duration(milliseconds: 2000),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: Get.height * 0.03),
+                        GestureDetector(
+                          onTap: () async {
+                            await pickImageDialog(up);
+                          },
+                          child: Card(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                // color: App.themecolor4.withOpacity(0.8),
+                                color: Get.theme.cardColor,
+                              ),
+                              padding: const EdgeInsets.all(10),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  h6Text(
+                                    'Change profile pic',
+                                    // color: const Color(App.swatchCode),
+                                  ),
+                                  Icon(
+                                    Icons.edit_outlined,
+                                    color: Get.theme.colorScheme.primary,
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
-                        ],
-                      ),
-                      SizedBox(height: Get.height * 0.03),
-                      GestureDetector(
-                        onTap: () async {
-                          await pickImageDialog(up);
-                        },
-                        child: Card(
+                        ),
+                        SizedBox(height: Get.height * 0.03),
+                        Card(
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Container(
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10),
-                              // color: App.themecolor4.withOpacity(0.8),
                               color: Get.theme.cardColor,
                             ),
-                            padding: const EdgeInsets.all(10),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 20, horizontal: 10),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                h6Text(
-                                  'Change profile pic',
-                                  // color: const Color(App.swatchCode),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        h6Text(
+                                          'Personal Information',
+                                          fontWeight: FontWeight.bold,
+                                          color: Get.theme.colorScheme.primary,
+                                        )
+                                      ],
+                                    ),
+                                    const SizedBox(height: 15),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                            child: h5Text(
+                                                up.associate.data!.fullName ??
+                                                    '',
+                                                fontWeight: FontWeight.bold)),
+                                      ],
+                                    ),
+                                    SizedBox(height: Get.height * 0.01),
+                                    h6Text(
+                                        'Email : ${up.associate.data!.email ?? 'N/A'}'),
+                                    SizedBox(height: Get.height * 0.01),
+                                    h6Text(
+                                        'Phone : ${up.associate.data!.phone ?? 'N/A'}'),
+                                    SizedBox(height: Get.height * 0.01),
+                                    Row(
+                                      children: [
+                                        Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            h6Text('Address : '),
+                                          ],
+                                        ),
+                                        Expanded(
+                                          child: h6Text(
+                                              up.associate.data!.address ??
+                                                  'N/A'),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: Get.height * 0.01),
+                                    Row(
+                                      children: [
+                                        h6Text(
+                                          'Sponsor Id : ',
+                                          // color: Colors.white,
+                                        ),
+                                        h6Text(
+                                          (up.associate.data!.sponsorId ?? '')
+                                              .capitalize!,
+                                          // color: Colors.white,
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: Get.height * 0.01),
+                                    Row(
+                                      children: [
+                                        Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            h6Text('Address : '),
+                                          ],
+                                        ),
+                                        Expanded(
+                                          child: h6Text(
+                                              up.associate.data!.address ??
+                                                  'N/A'),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: Get.height * 0.01),
+                                  ],
                                 ),
-                                Icon(
-                                  Icons.edit_outlined,
-                                  color: Get.theme.colorScheme.primary,
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(10),
+                                        child: LinearProgressIndicator(
+                                          minHeight: 15,
+                                          value: profileValue,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        h6Text(
+                                          'Profile',
+                                          // color: Colors.white,
+                                        ),
+                                        b1Text(
+                                          '  ${profileValue == 1 ? '✅' : "${(profileValue * 100).floor()}%"}   Completed',
+                                          // color: Colors.white,
+                                        ),
+                                      ],
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.push(
+                                            context,
+                                            slideLeftRoute(const EditProfile(),
+                                                effect: PageTransitionType
+                                                    .rightToLeftJoined,
+                                                current: const ProfilePage()));
+                                      },
+                                      child: h6Text(
+                                        'Edit',
+                                        color: Get.theme.colorScheme.primary,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
                           ),
                         ),
-                      ),
-                      SizedBox(height: Get.height * 0.03),
-                      Card(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: Get.theme.cardColor,
-                          ),
-                          padding:
-                              const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Column(
+                        SizedBox(height: Get.height * 0.03),
+                        Builder(builder: (context) {
+                          double paid = 30000;
+                          double purchasePaid = (paid /
+                              double.parse(up.associate.data!.plotTotalPrice!));
+                          return Card(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: Get.theme.cardColor,
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 20, horizontal: 10),
+                              child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                          child: h5Text(
-                                              up.associate.data!.fullName ?? '',
-                                              fontWeight: FontWeight.bold)),
-                                    ],
-                                  ),
-                                  SizedBox(height: Get.height * 0.01),
-                                  h6Text(
-                                      'Email : ${up.associate.data!.email ?? 'N/A'}'),
-                                  SizedBox(height: Get.height * 0.01),
-                                  h6Text(
-                                      'Phone : ${up.associate.data!.phone ?? 'N/A'}'),
-                                  SizedBox(height: Get.height * 0.01),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Row(
                                         children: [
                                           h6Text(
-                                            'Status : ',
-                                            // color: Colors.white,
-                                          ),
-                                          h6Text(
-                                            (up.associate.data!.status ?? '')
-                                                .capitalize!,
-                                            // color: Colors.white,
-                                          ),
+                                            'Purchase Details',
+                                            fontWeight: FontWeight.bold,
+                                            color:
+                                                Get.theme.colorScheme.primary,
+                                          )
                                         ],
                                       ),
-
-                                    ],
-                                  ),
-                                  SizedBox(height: Get.height * 0.01),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          h6Text(
-                                            'Plot Area : ',
-                                            // color: Colors.white,
-                                          ),
-                                          h6Text(
-                                            (up.associate.data!.plotArea ?? '')
-                                                .capitalize!,
-                                            // color: Colors.white,
-                                          ),
-                                        ],
-                                      ),
-
-                                    ],
-                                  ),
-                                  SizedBox(height: Get.height * 0.01),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
+                                      const SizedBox(height: 15),
                                       Row(
                                         children: [
                                           h6Text(
@@ -214,236 +323,264 @@ class _ProfilePageState extends State<ProfilePage> {
                                           h6Text(
                                             (up.associate.data!.plotNo ?? '')
                                                 .capitalize!,
+                                            // color: Colors.white,
                                           ),
                                         ],
                                       ),
-
-                                    ],
-                                  ),
-                                  SizedBox(height: Get.height * 0.01),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
+                                      SizedBox(height: Get.height * 0.01),
                                       Row(
                                         children: [
                                           h6Text(
-                                            'Sponsor Id : ',
+                                            'Purchase Amount : Rs. ',
                                             // color: Colors.white,
                                           ),
                                           h6Text(
-                                            (up.associate.data!.sponsorId ?? '')
+                                            (up.associate.data!
+                                                        .plotTotalPrice ??
+                                                    '')
                                                 .capitalize!,
                                             // color: Colors.white,
                                           ),
                                         ],
                                       ),
-
-                                    ],
-                                  ),
-                                  SizedBox(height: Get.height * 0.01),
-                                  Row(
-                                    children: [
-                                      Column(
-                                        mainAxisAlignment: MainAxisAlignment.start,
+                                      SizedBox(height: Get.height * 0.01),
+                                      Row(
                                         children: [
-                                          h6Text('Address : '),
+                                          h6Text(
+                                            'Plot Area : ',
+                                            // color: Colors.white,
+                                          ),
+                                          h6Text(
+                                            (up.associate.data!.plotArea ?? '')
+                                                .capitalize!,
+                                          ),
                                         ],
                                       ),
-                                      Expanded(
-                                        child:
-                                            h6Text(up.associate.data!.address ?? 'N/A'),
+                                      SizedBox(height: Get.height * 0.01),
+                                      Row(
+                                        children: [
+                                          h6Text(
+                                            'Rate : Rs. ',
+                                            // color: Colors.white,
+                                          ),
+                                          h6Text(
+                                            (up.associate.data!.plotRate ?? '')
+                                                .capitalize!,
+                                            // color: Colors.white,
+                                          ),
+                                        ],
                                       ),
+                                      SizedBox(height: Get.height * 0.01),
+                                      Row(
+                                        children: [
+                                          h6Text(
+                                            'Discount : Rs. ',
+                                            // color: Colors.white,
+                                          ),
+                                          h6Text(
+                                            (up.associate.data!.plotDiscount ??
+                                                    '')
+                                                .capitalize!,
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(height: Get.height * 0.01),
                                     ],
                                   ),
-                                  SizedBox(height: Get.height * 0.01),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(10),
-                                      child: LinearProgressIndicator(
-                                        minHeight: 15,
-                                        value: profileValue,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
                                   Row(
                                     children: [
-                                      h6Text(
-                                        'Profile',
-                                        // color: Colors.white,
-                                      ),
-                                      b1Text(
-                                        '  ${profileValue == 1 ? '✅' : "${(profileValue * 100).floor()}%"}   Completed',
-                                        // color: Colors.white,
+                                      Expanded(
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          child: LinearProgressIndicator(
+                                            minHeight: 15,
+                                            value: purchasePaid,
+                                          ),
+                                        ),
                                       ),
                                     ],
                                   ),
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.push(
-                                          context,
-                                          slideLeftRoute(const EditProfile(),
-                                              effect:
-                                                  PageTransitionType.rightToLeftJoined,
-                                              current: const ProfilePage()));
-                                    },
-                                    child: h6Text(
-                                      'Edit',
-                                      color: Get.theme.colorScheme.primary,
-                                    ),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          h6Text(
+                                            'Paid',
+                                            // color: Colors.white,
+                                          ),
+                                          // b1Text(
+                                          //   '  ${profileValue == 1 ? '✅' : "${(profileValue * 100).floor()}%"}   Completed',
+                                          //   // color: Colors.white,
+                                          // ),
+                                          h6Text(
+                                            '  ${(purchasePaid * 100).toStringAsFixed(2)} %',
+                                            // color: Colors.white,
+                                          ),
+                                        ],
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          // Navigator.push(
+                                          //     context,
+                                          //     slideLeftRoute(const EditProfile(),
+                                          //         effect: PageTransitionType
+                                          //             .rightToLeftJoined,
+                                          //         current: const ProfilePage()));
+                                        },
+                                        child: h6Text(
+                                          'Details',
+                                          color: Get.theme.colorScheme.primary,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
-                            ],
+                            ),
+                          );
+                        }),
+                        SizedBox(height: Get.height * 0.03),
+                        GestureDetector(
+                          onTap: () async {
+                            if (up.associate.data!.phone == null ||
+                                up.associate.data!.phone == '') {
+                              Fluttertoast.showToast(
+                                  msg: 'Your phone number is not registered');
+                            } else {
+                              Provider.of<AuthProvider>(context, listen: false)
+                                  .phoneController
+                                  .text = up.associate.data!.phone!;
+                              showModalBottomSheet(
+                                  context: context,
+                                  builder: (context) {
+                                    return const PhoneVerificationSheet();
+                                  });
+                            }
+                            // showShortSheetActions(
+                            //     width: Get.width * 0.8,
+                            //     color: Colors.white,
+                            //     height: 250+MediaQuery.of(context).viewInsets.bottom,
+                            //     child: Padding(
+                            //       padding: const EdgeInsets.all(8.0),
+                            //       child: SingleChildScrollView(
+                            //         child: Column(
+                            //           mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            //           children: [
+                            //             Row(
+                            //               children: [
+                            //                 Expanded(
+                            //                     child: h6Text(
+                            //                         'Please verify your identity',
+                            //                         color: Colors.redAccent)),
+                            //               ],
+                            //             ),
+                            //             const SizedBox(height: 5),
+                            //             Row(
+                            //               children: [
+                            //                 Expanded(
+                            //                   child: b1Text(
+                            //                       'Enter your registered phone number'),
+                            //                 ),
+                            //               ],
+                            //             ),
+                            //             const SizedBox(height: 3),
+                            //             Row(
+                            //               children: const [
+                            //                 Expanded(
+                            //                     child: TextField(
+                            //                   keyboardType: TextInputType.number,
+                            //                 )),
+                            //               ],
+                            //             ),
+                            //             const SizedBox(height: 5),
+                            //             Row(
+                            //               mainAxisAlignment:
+                            //                   MainAxisAlignment.spaceAround,
+                            //               children: [
+                            //                 ElevatedButton(
+                            //                   onPressed: () {
+                            //                     Get.back();
+                            //                   },
+                            //                   child: const Text('Cancel'),
+                            //                 ),
+                            //                 ElevatedButton(
+                            //                   onPressed: () {
+                            //                     Get.back();
+                            //                   },
+                            //                   child: const Text('Submit'),
+                            //                 ),
+                            //               ],
+                            //             )
+                            //           ],
+                            //         ),
+                            //       ),
+                            //     ));
+                            ///
+                            // await Provider.of<AuthProvider>(context, listen: false)
+                            //     .phoneVerification('+919135324545');
+                            // Navigator.push(
+                            //     context,
+                            //     slideLeftRoute(const UpdatePassword(),
+                            //         effect: PageTransitionType.rightToLeftJoined,
+                            //         current: const ProfilePage()));
+                          },
+                          child: Card(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: Get.theme.cardColor,
+                              ),
+                              padding: const EdgeInsets.all(10),
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.key,
+                                  ),
+                                  SizedBox(width: Get.width * 0.1),
+                                  h6Text('Change Password'),
+                                ],
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                      SizedBox(height: Get.height * 0.03),
-                      GestureDetector(
-                        onTap: () async {
-                          if (up.associate.data!.phone == null ||
-                              up.associate.data!.phone == '') {
-                            Fluttertoast.showToast(
-                                msg: 'Your phone number is not registered');
-                          } else {
-                            Provider.of<AuthProvider>(context, listen: false)
-                                .phoneController
-                                .text = up.associate.data!.phone!;
-                            showModalBottomSheet(
-                                context: context,
-                                builder: (context) {
-                                  return const PhoneVerificationSheet();
-                                });
-                          }
-                          // showShortSheetActions(
-                          //     width: Get.width * 0.8,
-                          //     color: Colors.white,
-                          //     height: 250+MediaQuery.of(context).viewInsets.bottom,
-                          //     child: Padding(
-                          //       padding: const EdgeInsets.all(8.0),
-                          //       child: SingleChildScrollView(
-                          //         child: Column(
-                          //           mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          //           children: [
-                          //             Row(
-                          //               children: [
-                          //                 Expanded(
-                          //                     child: h6Text(
-                          //                         'Please verify your identity',
-                          //                         color: Colors.redAccent)),
-                          //               ],
-                          //             ),
-                          //             const SizedBox(height: 5),
-                          //             Row(
-                          //               children: [
-                          //                 Expanded(
-                          //                   child: b1Text(
-                          //                       'Enter your registered phone number'),
-                          //                 ),
-                          //               ],
-                          //             ),
-                          //             const SizedBox(height: 3),
-                          //             Row(
-                          //               children: const [
-                          //                 Expanded(
-                          //                     child: TextField(
-                          //                   keyboardType: TextInputType.number,
-                          //                 )),
-                          //               ],
-                          //             ),
-                          //             const SizedBox(height: 5),
-                          //             Row(
-                          //               mainAxisAlignment:
-                          //                   MainAxisAlignment.spaceAround,
-                          //               children: [
-                          //                 ElevatedButton(
-                          //                   onPressed: () {
-                          //                     Get.back();
-                          //                   },
-                          //                   child: const Text('Cancel'),
-                          //                 ),
-                          //                 ElevatedButton(
-                          //                   onPressed: () {
-                          //                     Get.back();
-                          //                   },
-                          //                   child: const Text('Submit'),
-                          //                 ),
-                          //               ],
-                          //             )
-                          //           ],
-                          //         ),
-                          //       ),
-                          //     ));
-                          ///
-                          // await Provider.of<AuthProvider>(context, listen: false)
-                          //     .phoneVerification('+919135324545');
-                          // Navigator.push(
-                          //     context,
-                          //     slideLeftRoute(const UpdatePassword(),
-                          //         effect: PageTransitionType.rightToLeftJoined,
-                          //         current: const ProfilePage()));
-                        },
-                        child: Card(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
+                        SizedBox(height: Get.height * 0.03),
+                        GestureDetector(
+                          onTap: () async {
+                            await Provider.of<AuthProvider>(context,
+                                    listen: false)
+                                .logOut();
+                          },
                           child: Container(
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10),
-                              color: Get.theme.cardColor,
+                              color: Colors.redAccent,
                             ),
                             padding: const EdgeInsets.all(10),
                             child: Row(
                               children: [
                                 const Icon(
-                                  Icons.key,
+                                  Icons.logout,
+                                  color: Colors.white,
                                 ),
                                 SizedBox(width: Get.width * 0.1),
-                                h6Text('Change Password'),
+                                h6Text('Logout', color: Colors.white),
                               ],
                             ),
                           ),
                         ),
-                      ),
-                      SizedBox(height: Get.height * 0.03),
-                      GestureDetector(
-                        onTap: () async {
-                          await Provider.of<AuthProvider>(context, listen: false)
-                              .logOut();
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: Colors.redAccent,
-                          ),
-                          padding: const EdgeInsets.all(10),
-                          child: Row(
-                            children: [
-                              const Icon(
-                                Icons.logout,
-                                color: Colors.white,
-                              ),
-                              SizedBox(width: Get.width * 0.1),
-                              h6Text('Logout', color: Colors.white),
-                            ],
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: Get.height * 0.03),
-
-                    ],
+                        SizedBox(height: Get.height * 0.03),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       );

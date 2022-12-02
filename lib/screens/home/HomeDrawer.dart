@@ -43,7 +43,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
             children: [
               Container(
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary.withOpacity(0.6),
+                  color: Theme.of(context).colorScheme.primary.withOpacity(0.9),
                 ),
                 height: kToolbarHeight * 2.2,
                 child: Column(
@@ -96,115 +96,110 @@ class _HomeDrawerState extends State<HomeDrawer> {
                 ),
               ),
               Positioned(
-                  top: kToolbarHeight / 2,
+                  // top: Get.statusBarHeight + 10,
                   right: 10,
-                  child: IconButton(
-                      splashColor: Colors.white,
-                      onPressed: () {
-                        Provider.of<ThemeProvider>(context, listen: false)
-                            .toogleBrt();
-                        widget.onChangeTheme();
-
-                      },
-                      icon: const Icon(
-                        Icons.settings_outlined,
-                        color: Colors.white,
-                      )))
+                  child: SafeArea(
+                    child: IconButton(
+                        splashColor: Colors.white,
+                        onPressed: () {
+                          Provider.of<ThemeProvider>(context, listen: false)
+                              .toogleBrt();
+                          widget.onChangeTheme();
+                        },
+                        icon:  Icon(
+                         Theme.of(context).brightness==Brightness.dark? Icons.dark_mode:Icons.light_mode,
+                          color: Colors.white,
+                        )),
+                  ))
             ],
           ),
-          Card(
-            margin: const EdgeInsets.all(0),
-            child: Container(
-              height: widget.height * 0.13,
-              decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  children: [
-                    GestureDetector(
-                      onTap: () {},
-                      child: Container(
-                        height: widget.height * 0.13,
-                        width: widget.height * 0.13,
-                        // color: Colors.white,
-                        margin: const EdgeInsets.symmetric(horizontal: 3),
-
-                        child: Column(
-                          children: [
-                            SizedBox(height: widget.height * 0.02),
-                            Expanded(
-                                child: Image.asset('assets/drawer/notice.png')),
-                            SizedBox(height: widget.height * 0.02),
-                            Row(
-                              children: [
-                                Expanded(
-                                    child: b1Text('Notice',
-                                        textAlign: TextAlign.center,
-                                        maxLine: 1)),
-                              ],
-                            ),
-                          ],
-                        ),
+          SizedBox(
+            height: widget.height * 0.13,
+            // decoration: BoxDecoration(
+            //   // color: Theme.of(context).cardColor,
+            //   color: Colors.transparent,
+            // ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                children: [
+                  GestureDetector(
+                    onTap: () {},
+                    child: Container(
+                      height: widget.height * 0.13,
+                      width: widget.height * 0.13,
+                      color: Colors.transparent,
+                      margin: const EdgeInsets.symmetric(horizontal: 3),
+                      child: Column(
+                        children: [
+                          SizedBox(height: widget.height * 0.02),
+                          Expanded(
+                              child: Image.asset('assets/drawer/notice.png')),
+                          SizedBox(height: widget.height * 0.02),
+                          Row(
+                            children: [
+                              Expanded(
+                                  child: b1Text('Notice',
+                                      textAlign: TextAlign.center, maxLine: 1)),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
-                    GestureDetector(
-                      onTap: () {},
-                      child: Container(
-                        height: widget.height * 0.13,
-                        width: widget.height * 0.13,
-                        // color: Colors.white,
-                        margin: const EdgeInsets.symmetric(horizontal: 3),
+                  ),
+                  GestureDetector(
+                    onTap: () {},
+                    child: Container(
+                      height: widget.height * 0.13,
+                      width: widget.height * 0.13,
+                      // color: Colors.white,
+                      margin: const EdgeInsets.symmetric(horizontal: 3),
 
-                        child: Column(
-                          children: [
-                            SizedBox(height: widget.height * 0.02),
-                            Expanded(
-                                child: Image.asset('assets/drawer/notice.png')),
-                            SizedBox(height: widget.height * 0.02),
-                            Row(
-                              children: [
-                                Expanded(
-                                    child: b1Text('Activities',
-                                        textAlign: TextAlign.center,
-                                        maxLine: 1)),
-                              ],
-                            ),
-                          ],
-                        ),
+                      child: Column(
+                        children: [
+                          SizedBox(height: widget.height * 0.02),
+                          Expanded(
+                              child: Image.asset('assets/drawer/notice.png')),
+                          SizedBox(height: widget.height * 0.02),
+                          Row(
+                            children: [
+                              Expanded(
+                                  child: b1Text('Activities',
+                                      textAlign: TextAlign.center, maxLine: 1)),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
-                    GestureDetector(
-                      onTap: () {},
-                      child: Container(
-                        height: widget.height * 0.13,
-                        width: widget.height * 0.13,
-                        // color: Colors.white,
-                        margin: const EdgeInsets.symmetric(horizontal: 3),
+                  ),
+                  GestureDetector(
+                    onTap: () {},
+                    child: Container(
+                      height: widget.height * 0.13,
+                      width: widget.height * 0.13,
+                      // color: Colors.white,
+                      margin: const EdgeInsets.symmetric(horizontal: 3),
 
-                        child: Column(
-                          children: [
-                            SizedBox(height: widget.height * 0.02),
-                            Expanded(
-                                child: Image.asset('assets/drawer/notice.png')),
-                            SizedBox(height: widget.height * 0.02),
-                            Row(
-                              children: [
-                                Expanded(
-                                    child: b1Text('Notice',
-                                        textAlign: TextAlign.center,
-                                        maxLine: 1)),
-                              ],
-                            ),
-                          ],
-                        ),
+                      child: Column(
+                        children: [
+                          SizedBox(height: widget.height * 0.02),
+                          Expanded(
+                              child: Image.asset('assets/drawer/notice.png')),
+                          SizedBox(height: widget.height * 0.02),
+                          Row(
+                            children: [
+                              Expanded(
+                                  child: b1Text('Notice',
+                                      textAlign: TextAlign.center, maxLine: 1)),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
