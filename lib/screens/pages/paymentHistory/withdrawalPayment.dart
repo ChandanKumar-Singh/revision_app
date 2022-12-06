@@ -4,6 +4,10 @@ import 'package:get/get.dart';
 
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:revision/providers/PaymentsHistoryProvider.dart';
+import 'package:revision/providers/PaymentsHistoryProvider.dart';
+import 'package:revision/screens/pages/paymentHistory/recievedPayment.dart';
 
 class WithDrawPaymentsPage extends StatefulWidget {
   const WithDrawPaymentsPage({Key? key}) : super(key: key);
@@ -15,173 +19,173 @@ class WithDrawPaymentsPage extends StatefulWidget {
 class _WithDrawPaymentsPageState extends State<WithDrawPaymentsPage> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
+  void init() async {
+    await Provider.of<PaymentsHistoryProvider>(context, listen: false)
+        .getWithdraws();
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    // SystemChrome.setSystemUIOverlayStyle(
-    //     SystemUiOverlayStyle(statusBarColor: Colors.green));
+    init();
   }
 
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-    // SystemChrome.setSystemUIOverlayStyle(
-    // SystemUiOverlayStyle(statusBarColor: Theme.of(context).cardColor));
+  Future<bool> willPop() async {
+    var php = Provider.of<PaymentsHistoryProvider>(context, listen: false);
+    php.withDraws.clear();
+    php.totalWithdraw = 0;
+    php.loadingWithdrawal = false;
+    php.filterApplied = false;
+    php.filterData.clear();
+    php.fromDate = DateTime.now().subtract(const Duration(days: 1));
+    php.toDate = DateTime.now();
+    debugPrint('On will pop withdraws length ${php.withDraws.length} ');
+    return true;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: scaffoldKey,
-      backgroundColor: Theme.of(context).cardColor.withOpacity(0.9),
-      body: NestedScrollView(
-        headerSliverBuilder: (context, _) => [
-          SliverAppBar(
-            expandedHeight: 220,
-            // collapsedHeight: 100,
-            pinned: true,
-            floating: true,
-            snap: false,
-            backgroundColor: Theme.of(context).primaryColor,
-            automaticallyImplyLeading: true,
-            actions: [],
-            // iconTheme:
-            //     IconThemeData(color: Theme.of(context).colorScheme.primary),
-
-            flexibleSpace: FlexibleSpaceBar(
-              background: Image.asset(
-                'assets/withdraw.jpg',
-                // 'assets/gift/gift-13.gif',
-                width: double.infinity,
-                fit: BoxFit.cover,
-              ),
-              centerTitle: true,
-              expandedTitleScale: 1.2,
-              titlePadding:
-                  const EdgeInsetsDirectional.fromSTEB(50, 10, 10, 10),
-              title: SizedBox(
-                height: 30,
-                child: ListView(
-                  padding: EdgeInsets.zero,
-                  scrollDirection: Axis.horizontal,
-                  // spacing: 10,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.only(right: 15),
-                      child: Chip(
-                        label: Text(
-                          'selecet',
-                          textScaleFactor: 1,
-                        ),
-                        backgroundColor: Theme.of(context).cardColor,
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(right: 15),
-                      child: Chip(
-                        label: Text('selecet'),
-                        backgroundColor: Theme.of(context).cardColor,
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(right: 15),
-                      child: Chip(
-                        label: Text('selecet'),
-                        backgroundColor: Theme.of(context).cardColor,
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(right: 15),
-                      child: Chip(
-                        label: Text('selecet'),
-                        backgroundColor: Theme.of(context).cardColor,
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(right: 15),
-                      child: Chip(
-                        label: Text('selecet'),
-                        backgroundColor: Theme.of(context).cardColor,
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(right: 15),
-                      child: Chip(
-                        label: Text('selecet'),
-                        backgroundColor: Theme.of(context).cardColor,
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(right: 15),
-                      child: Chip(
-                        label: Text('selecet'),
-                        backgroundColor: Theme.of(context).cardColor,
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(right: 15),
-                      child: Chip(
-                        label: Text('selecet'),
-                        backgroundColor: Theme.of(context).cardColor,
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(right: 15),
-                      child: Chip(
-                        label: Text('selecet'),
-                        backgroundColor: Theme.of(context).cardColor,
-                      ),
-                    ),
-                  ],
-                ),
+    return WillPopScope(
+      onWillPop: willPop,
+      child: Scaffold(
+        key: scaffoldKey,
+        backgroundColor: Theme.of(context).cardColor.withOpacity(0.9),
+        body: Consumer<PaymentsHistoryProvider>(builder: (context, php, _) {
+          return Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Theme.of(context).colorScheme.primary.withOpacity(0.7),
+                  Theme.of(context).colorScheme.onBackground.withOpacity(1),
+                ],
+                stops: [0, 1],
+                begin: const AlignmentDirectional(0, -1),
+                end: const AlignmentDirectional(0, 1),
               ),
             ),
-            elevation: 0,
-          )
-        ],
-        body: Builder(
-          builder: (context) {
-            return GestureDetector(
-              onTap: () => FocusScope.of(context).unfocus(),
-              child: Stack(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Theme.of(context)
-                              .colorScheme
-                              .primary
-                              .withOpacity(0.7),
-                          Theme.of(context)
-                              .colorScheme
-                              .onBackground
-                              .withOpacity(1),
-                        ],
-                        stops: [0, 1],
-                        begin: const AlignmentDirectional(0, -1),
-                        end: const AlignmentDirectional(0, 1),
-                      ),
+            child: NestedScrollView(
+              headerSliverBuilder: (context, _) => [
+                SliverAppBar(
+                  expandedHeight: 220,
+                  // collapsedHeight: 100,
+                  pinned: true,
+                  floating: true,
+                  snap: false,
+                  backgroundColor: Theme.of(context).primaryColor,
+                  automaticallyImplyLeading: true,
+                  // IconThemeData(color:
+                  // Theme.of(context).colorScheme.primary),
+
+                  actions: [
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: IconButton(
+                          onPressed: () {
+                            showModalBottomSheet(
+                                context: context,
+                                builder: (context) {
+                                  return const DateFilterSheet(
+                                    type: HistoryType.withdrawal,
+                                  );
+                                });
+                          },
+                          icon: Stack(
+                            children: [
+                              const Icon(Icons.filter_list),
+                              if (php.filterApplied)
+                                Positioned(
+                                  right: 0,
+                                  child: Container(
+                                    decoration: const BoxDecoration(
+                                      color: Colors.red,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    height: 7,
+                                    width: 7,
+                                  ),
+                                ),
+                            ],
+                          )),
+                    )
+                  ],
+                  // iconTheme:
+                  //     IconThemeData(color: Theme.of(context).colorScheme.primary),
+
+                  flexibleSpace: FlexibleSpaceBar(
+                    background: Image.asset(
+                      'assets/withdraw.jpg',
+                      // 'assets/gift/gift-13.gif',
+                      width: double.infinity,
+                      fit: BoxFit.cover,
                     ),
-                    child: Padding(
-                      padding: const EdgeInsetsDirectional.fromSTEB(5, 0, 5, 0),
-                      child: Builder(
-                        builder: (context) {
-                          final requestCard =
-                              List.generate(10, (index) => index)
-                                  .toList()
-                                  .take(15)
-                                  .toList();
-                          return ListView.builder(
-                            padding: EdgeInsets.zero,
+                    centerTitle: true,
+                    expandedTitleScale: 1.2,
+                    title: const Text('Withdrawal'),
+                    // titlePadding:
+                    //     const EdgeInsetsDirectional.fromSTEB(50, 10, 10, 10),
+                    // title: SizedBox(
+                    //   height: 30,
+                    //   child: ListView(
+                    //     padding: EdgeInsets.zero,
+                    //     scrollDirection: Axis.horizontal,
+                    //     // spacing: 10,
+                    //     children: [
+                    //       Padding(
+                    //         padding: const EdgeInsets.only(right: 15),
+                    //         child: Chip(
+                    //           deleteIcon: const Icon(Icons.arrow_drop_down),
+                    //           onDeleted: () {
+                    //             php.searchWidget(
+                    //                 list: php.receives,
+                    //                 field: 'fd',
+                    //                 context: context);
+                    //           },
+                    //           label: Text(php.fromDate != null
+                    //               ? DateFormat('dd MMM yyyy')
+                    //                   .format(php.fromDate)
+                    //               : 'From '),
+                    //           backgroundColor: Theme.of(context).cardColor,
+                    //         ),
+                    //       ),
+                    //       Padding(
+                    //         padding: const EdgeInsets.only(right: 15),
+                    //         child: Chip(
+                    //           deleteIcon: const Icon(Icons.arrow_drop_down),
+                    //           onDeleted: () {
+                    //             php.searchWidget(
+                    //                 list: php.receives,
+                    //                 field: 'td',
+                    //                 context: context);
+                    //           },
+                    //           label: Text(
+                    //               DateFormat('dd MMM yyyy').format(php.toDate)),
+                    //           backgroundColor: Theme.of(context).cardColor,
+                    //         ),
+                    //       ),
+                    //     ],
+                    //   ),
+                    // ),
+                  ),
+                  elevation: 0,
+                )
+              ],
+              body: Builder(
+                builder: (context) {
+                  return GestureDetector(
+                    onTap: () => FocusScope.of(context).unfocus(),
+                    child: Stack(
+                      children: [
+                        Padding(
+                          padding:
+                              const EdgeInsetsDirectional.fromSTEB(5, 0, 5, 0),
+                          child: ListView.builder(
+                            padding: const EdgeInsets.symmetric(vertical: 15),
                             shrinkWrap: true,
                             scrollDirection: Axis.vertical,
-                            itemCount: requestCard.length,
-                            itemBuilder: (context, requestCardIndex) {
-                              final requestCardItem =
-                                  requestCard[requestCardIndex];
+                            itemCount: php.withDraws.length,
+                            itemBuilder: (context, i) {
+                              final withDraw = php.withDraws[i];
 
                               return Padding(
                                 padding: const EdgeInsetsDirectional.fromSTEB(
@@ -214,7 +218,7 @@ class _WithDrawPaymentsPageState extends State<WithDrawPaymentsPage> {
                                             //   .withOpacity(0.7),],
                                             // ),
                                             color: Theme.of(context).cardColor,
-                                            border: Border.all(),
+                                            // border: Border.all(),
                                             borderRadius:
                                                 const BorderRadius.only(
                                               bottomLeft: Radius.circular(10),
@@ -240,16 +244,25 @@ class _WithDrawPaymentsPageState extends State<WithDrawPaymentsPage> {
                                                         children: [
                                                           Expanded(
                                                             child: Text(
-                                                              'Requested for Rs. 30343000',
+                                                              'Requested for Rs. ${withDraw.requestedAmount ?? ''}',
                                                               textAlign:
                                                                   TextAlign
                                                                       .start,
                                                               style: Theme.of(
                                                                       context)
                                                                   .textTheme
-                                                                  .headline6!.copyWith(color: Theme.of(context).textTheme.headline6!.color!.withOpacity(0.5),
+                                                                  .headline6!
+                                                                  .copyWith(
+                                                                    color: Theme.of(
+                                                                            context)
+                                                                        .textTheme
+                                                                        .headline6!
+                                                                        .color!
+                                                                        .withOpacity(
+                                                                            0.5),
+                                                                  ),
                                                             ),
-                                                          ),),
+                                                          ),
                                                           Container(
                                                             // width: 100,
                                                             // height: 30,
@@ -285,8 +298,9 @@ class _WithDrawPaymentsPageState extends State<WithDrawPaymentsPage> {
                                                                 Text(
                                                                   DateFormat(
                                                                           'dd MMM yyyy   hh:mm a')
-                                                                      .format(DateTime
-                                                                          .now()),
+                                                                      .format(DateTime.parse(
+                                                                          withDraw
+                                                                              .requestedDate!)),
                                                                   style: Theme.of(
                                                                           context)
                                                                       .textTheme
@@ -294,9 +308,11 @@ class _WithDrawPaymentsPageState extends State<WithDrawPaymentsPage> {
                                                                       .copyWith(
                                                                         fontFamily:
                                                                             'Lato',
-                                                                        color: Theme.of(context)
-                                                                            .colorScheme
-                                                                            .secondary,
+                                                                        // color: Colors.green
+                                                                        // color: Theme.of(
+                                                                        //         context)
+                                                                        //     .colorScheme
+                                                                        //     .p,
                                                                       ),
                                                                 ),
                                                               ],
@@ -310,14 +326,17 @@ class _WithDrawPaymentsPageState extends State<WithDrawPaymentsPage> {
                                                         children: [
                                                           Expanded(
                                                             child: Text(
-                                                              'Received for Rs. 3000',
+                                                              'Received for Rs. ${withDraw.recivedAmount ?? ''}',
                                                               textAlign:
                                                                   TextAlign
                                                                       .start,
                                                               style: Theme.of(
                                                                       context)
                                                                   .textTheme
-                                                                  .headline6!.copyWith(color: Colors.green),
+                                                                  .headline6!
+                                                                  .copyWith(
+                                                                      color: Colors
+                                                                          .green),
                                                             ),
                                                           ),
                                                         ],
@@ -336,7 +355,7 @@ class _WithDrawPaymentsPageState extends State<WithDrawPaymentsPage> {
                                                                       0,
                                                                       0),
                                                               child: Text(
-                                                                'description : Send me my next Payment',
+                                                                'description : ${withDraw.userComments ?? ''}',
                                                                 style: Theme.of(
                                                                         context)
                                                                     .textTheme
@@ -350,6 +369,13 @@ class _WithDrawPaymentsPageState extends State<WithDrawPaymentsPage> {
                                                         mainAxisSize:
                                                             MainAxisSize.max,
                                                         children: [
+                                                          const Icon(
+                                                            Icons
+                                                                .mark_chat_unread_outlined,
+                                                            size: 15,
+                                                          ),
+                                                          const SizedBox(
+                                                              width: 10),
                                                           Expanded(
                                                             child: Padding(
                                                               padding:
@@ -360,7 +386,9 @@ class _WithDrawPaymentsPageState extends State<WithDrawPaymentsPage> {
                                                                       0,
                                                                       0),
                                                               child: Text(
-                                                                '# : i\'lll send you within 10 hours',
+                                                                (withDraw.adminComments ??
+                                                                        '')
+                                                                    .capitalize!,
                                                                 style: Theme.of(
                                                                         context)
                                                                     .textTheme
@@ -415,7 +443,8 @@ class _WithDrawPaymentsPageState extends State<WithDrawPaymentsPage> {
                                           padding: const EdgeInsets.all(10),
                                           child: Text(
                                             DateFormat('dd MMM yyyy   hh:mm a')
-                                                .format(DateTime.now()),
+                                                .format(DateTime.parse(
+                                                    withDraw.receiveDate!)),
                                             style: Theme.of(context)
                                                 .textTheme
                                                 .bodyText1!
@@ -432,17 +461,16 @@ class _WithDrawPaymentsPageState extends State<WithDrawPaymentsPage> {
                                 ),
                               );
                             },
-                          );
-                        },
-                      ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-
-                ],
+                  );
+                },
               ),
-            );
-          },
-        ),
+            ),
+          );
+        }),
       ),
     );
   }

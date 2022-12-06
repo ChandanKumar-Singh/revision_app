@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 
-import 'package:google_fonts/google_fonts.dart';
+import 'package:gsform/gs_form/widget/form.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:revision/screens/pages/paymentHistory/recievedPayment.dart';
+import 'package:syncfusion_flutter_sliders/sliders.dart';
+
+import '../../../constants/widgets.dart';
+import '../../../providers/PaymentsHistoryProvider.dart';
 
 class RequestedPaymentsPage extends StatefulWidget {
   const RequestedPaymentsPage({Key? key}) : super(key: key);
@@ -13,181 +20,175 @@ class RequestedPaymentsPage extends StatefulWidget {
 
 class _RequestedPaymentsPageState extends State<RequestedPaymentsPage> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
+  void init() async {
+    await Provider.of<PaymentsHistoryProvider>(context, listen: false)
+        .getRequests();
+  }
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    // SystemChrome.setSystemUIOverlayStyle(
-    //     SystemUiOverlayStyle(statusBarColor: Colors.green));
+    init();
   }
 
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-    // SystemChrome.setSystemUIOverlayStyle(
-    // SystemUiOverlayStyle(statusBarColor: Theme.of(context).cardColor));
+  Future<bool> willPop() async {
+    var php = Provider.of<PaymentsHistoryProvider>(context, listen: false);
+    php.requests.clear();
+    php.totalRequests = 0;
+    php.loadingRequests = false;
+    php.filterApplied = false;
+    php.filterData.clear();
+    php.fromDate = DateTime.now().subtract(const Duration(days: 1));
+    php.toDate = DateTime.now();
+    debugPrint('On will pop withdraws length ${php.receives.length} ');
+    return true;
   }
+
+  late GSForm form;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: scaffoldKey,
-      backgroundColor: Theme.of(context).cardColor.withOpacity(0.9),
-      body: NestedScrollView(
-        headerSliverBuilder: (context, _) => [
-          SliverAppBar(
-            expandedHeight: 220,
-            // collapsedHeight: 100,
-            pinned: true,
-            floating: true,
-            snap: false,
-            backgroundColor: Theme.of(context).primaryColor,
-            automaticallyImplyLeading: true,
-            actions: [],
-            // iconTheme:
-            // IconThemeData(color: Theme.of(context).colorScheme.primary),
-
-            flexibleSpace: FlexibleSpaceBar(
-              background: Image.asset(
-                'assets/prequest.jpg',
-                // 'assets/gift/gift-13.gif',
-                width: double.infinity,
-                fit: BoxFit.fill,
-              ),
-              centerTitle: true,
-              expandedTitleScale: 1.2,
-              titlePadding:
-                  const EdgeInsetsDirectional.fromSTEB(50, 10, 10, 10),
-              title: SizedBox(
-                height: 30,
-                child: ListView(
-                  padding: EdgeInsets.zero,
-                  scrollDirection: Axis.horizontal,
-                  // spacing: 10,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(right: 15),
-                      child: Chip(
-                        label: const Text(
-                          'selecet',
-                          textScaleFactor: 1,
-                        ),
-                        backgroundColor: Theme.of(context).cardColor,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 15),
-                      child: Chip(
-                        label: const Text('selecet'),
-                        backgroundColor: Theme.of(context).cardColor,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 15),
-                      child: Chip(
-                        label: const Text('selecet'),
-                        backgroundColor: Theme.of(context).cardColor,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 15),
-                      child: Chip(
-                        label: const Text('selecet'),
-                        backgroundColor: Theme.of(context).cardColor,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 15),
-                      child: Chip(
-                        label: const Text('selecet'),
-                        backgroundColor: Theme.of(context).cardColor,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 15),
-                      child: Chip(
-                        label: const Text('selecet'),
-                        backgroundColor: Theme.of(context).cardColor,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 15),
-                      child: Chip(
-                        label: const Text('selecet'),
-                        backgroundColor: Theme.of(context).cardColor,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 15),
-                      child: Chip(
-                        label: const Text('selecet'),
-                        backgroundColor: Theme.of(context).cardColor,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 15),
-                      child: Chip(
-                        label: const Text('selecet'),
-                        backgroundColor: Theme.of(context).cardColor,
-                      ),
-                    ),
-                  ],
-                ),
+    return WillPopScope(
+      onWillPop: willPop,
+      child: Consumer<PaymentsHistoryProvider>(builder: (context, php, _) {
+        return Scaffold(
+          key: scaffoldKey,
+          backgroundColor: Theme.of(context).cardColor.withOpacity(0.9),
+          body: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Theme.of(context).colorScheme.primary.withOpacity(0.7),
+                  Theme.of(context).colorScheme.onBackground.withOpacity(1),
+                ],
+                stops: [0, 1],
+                begin: const AlignmentDirectional(0, -1),
+                end: const AlignmentDirectional(0, 1),
               ),
             ),
-            elevation: 0,
-          )
-        ],
-        body: Builder(
-          builder: (context) {
-            return GestureDetector(
-              onTap: () => FocusScope.of(context).unfocus(),
-              child: Stack(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Theme.of(context)
-                              .colorScheme
-                              .primary
-                              .withOpacity(0.7),
-                          Theme.of(context)
-                              .colorScheme
-                              .onBackground
-                              .withOpacity(1),
-                        ],
-                        stops: [0, 1],
-                        begin: const AlignmentDirectional(0, -1),
-                        end: const AlignmentDirectional(0, 1),
-                      ),
+            child: NestedScrollView(
+              headerSliverBuilder: (context, _) => [
+                SliverAppBar(
+                  expandedHeight: 220,
+                  // collapsedHeight: 100,
+                  pinned: true,
+                  floating: true,
+                  snap: false,
+                  backgroundColor: Theme.of(context).primaryColor,
+                  automaticallyImplyLeading: true,
+                  actions: [
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: IconButton(
+                          onPressed: () {
+                            showModalBottomSheet(
+                                context: context,
+                                builder: (context) {
+                                  return const DateFilterSheet(
+                                    type: HistoryType.request,
+                                  );
+                                });
+                          },
+                          icon: Stack(
+                            children: [
+                              const Icon(Icons.filter_list),
+                              if (php.filterApplied)
+                                Positioned(
+                                  right: 0,
+                                  child: Container(
+                                    decoration: const BoxDecoration(
+                                      color: Colors.red,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    height: 7,
+                                    width: 7,
+                                  ),
+                                ),
+                            ],
+                          )),
+                    )
+                  ],
+                  // iconTheme:
+                  // IconThemeData(color: Theme.of(context).colorScheme.primary),
+
+                  flexibleSpace: FlexibleSpaceBar(
+                    background: Image.asset(
+                      'assets/prequest.jpg',
+                      // 'assets/gift/gift-13.gif',
+                      width: double.infinity,
+                      fit: BoxFit.fill,
                     ),
-                    child: Padding(
-                      padding: const EdgeInsetsDirectional.fromSTEB(5, 0, 5, 0),
-                      child: Builder(
-                        builder: (context) {
-                          final requestCard =
-                              List.generate(10, (index) => index)
-                                  .toList()
-                                  .take(15)
-                                  .toList();
-                          return ListView.builder(
-                            padding: EdgeInsets.zero,
+                    centerTitle: true,
+                    expandedTitleScale: 1.2,
+                    title: const Text('Payment Requests'),
+                    // titlePadding:
+                    //     const EdgeInsetsDirectional.fromSTEB(50, 10, 10, 10),
+                    // title: SizedBox(
+                    //   height: 30,
+                    //   child: ListView(
+                    //     padding: EdgeInsets.zero,
+                    //     scrollDirection: Axis.horizontal,
+                    //     // spacing: 10,
+                    //     children: [
+                    //       Padding(
+                    //         padding: const EdgeInsets.only(right: 15),
+                    //         child: Chip(
+                    //           deleteIcon: const Icon(Icons.arrow_drop_down),
+                    //           onDeleted: () {
+                    //             php.searchWidget(
+                    //                 list: php.receives,
+                    //                 field: 'fd',
+                    //                 context: context);
+                    //           },
+                    //           label: Text(php.fromDate != null
+                    //               ? DateFormat('dd MMM yyyy')
+                    //                   .format(php.fromDate)
+                    //               : 'From '),
+                    //           backgroundColor: Theme.of(context).cardColor,
+                    //         ),
+                    //       ),
+                    //       Padding(
+                    //         padding: const EdgeInsets.only(right: 15),
+                    //         child: Chip(
+                    //           deleteIcon: const Icon(Icons.arrow_drop_down),
+                    //           onDeleted: () {
+                    //             php.searchWidget(
+                    //                 list: php.receives,
+                    //                 field: 'td',
+                    //                 context: context);
+                    //           },
+                    //           label: Text(
+                    //               DateFormat('dd MMM yyyy').format(php.toDate)),
+                    //           backgroundColor: Theme.of(context).cardColor,
+                    //         ),
+                    //       ),
+                    //     ],
+                    //   ),
+                    // ),
+                  ),
+                  elevation: 0,
+                )
+              ],
+              body: Builder(
+                builder: (context) {
+                  return GestureDetector(
+                    onTap: () => FocusScope.of(context).unfocus(),
+                    child: Stack(
+                      children: [
+                        Padding(
+                          padding:
+                              const EdgeInsetsDirectional.fromSTEB(5, 0, 5, 0),
+                          child: ListView.builder(
+                            padding: const EdgeInsets.symmetric(vertical: 20),
                             shrinkWrap: true,
                             scrollDirection: Axis.vertical,
-                            itemCount: requestCard.length,
+                            itemCount: php.requests.length,
                             itemBuilder: (context, i) {
-                              final requestCardItem = requestCard[i];
-                              var status;
-                              if (i % 3 == 0) {
-                                status = 0;
-                              } else if (i % 3 == 1) {
-                                status = 1;
-                              } else {
-                                status = 2;
-                              }
+                              final request = php.requests[i];
+
+                              int status = php.requests[i].paymentStatus!;
+
                               return Padding(
                                 padding: const EdgeInsetsDirectional.fromSTEB(
                                     5, 5, 5, 5),
@@ -248,7 +249,7 @@ class _RequestedPaymentsPageState extends State<RequestedPaymentsPage> {
                                                         children: [
                                                           Expanded(
                                                             child: Text(
-                                                              'Requested for Rs. 30000',
+                                                              'Requested for Rs. ${request.requestedAmount}',
                                                               textAlign:
                                                                   TextAlign
                                                                       .start,
@@ -270,12 +271,12 @@ class _RequestedPaymentsPageState extends State<RequestedPaymentsPage> {
                                                                         5),
                                                             decoration:
                                                                 BoxDecoration(
-                                                              color: i == 0
+                                                              color: status == 0
                                                                   ? Colors
                                                                       .yellow
                                                                       .withOpacity(
                                                                           0.2)
-                                                                  : i == 1
+                                                                  : status == 1
                                                                       ? Colors
                                                                           .green
                                                                           .withOpacity(
@@ -290,10 +291,12 @@ class _RequestedPaymentsPageState extends State<RequestedPaymentsPage> {
                                                                           40),
                                                               border:
                                                                   Border.all(
-                                                                color: i == 0
+                                                                color: status ==
+                                                                        0
                                                                     ? Colors
                                                                         .yellow
-                                                                    : i == 1
+                                                                    : status ==
+                                                                            1
                                                                         ? Colors
                                                                             .green
                                                                         : Colors
@@ -309,9 +312,10 @@ class _RequestedPaymentsPageState extends State<RequestedPaymentsPage> {
                                                                       .center,
                                                               children: [
                                                                 Text(
-                                                                  i == 0
+                                                                  status == 0
                                                                       ? 'Waiting'
-                                                                      : i == 1
+                                                                      : status ==
+                                                                              1
                                                                           ? "Received"
                                                                           : "Rejected",
                                                                   style: Theme.of(
@@ -321,10 +325,10 @@ class _RequestedPaymentsPageState extends State<RequestedPaymentsPage> {
                                                                       .copyWith(
                                                                         fontFamily:
                                                                             'Lato',
-                                                                        color: i ==
+                                                                        color: status ==
                                                                                 0
                                                                             ? Colors.yellow
-                                                                            : i == 1
+                                                                            : status == 1
                                                                                 ? Colors.green
                                                                                 : Colors.red,
                                                                       ),
@@ -348,7 +352,7 @@ class _RequestedPaymentsPageState extends State<RequestedPaymentsPage> {
                                                                       0,
                                                                       0),
                                                               child: Text(
-                                                                'description : Send me my next Payment',
+                                                                'description : ${request.userComments}',
                                                                 style: Theme.of(
                                                                         context)
                                                                     .textTheme
@@ -362,6 +366,13 @@ class _RequestedPaymentsPageState extends State<RequestedPaymentsPage> {
                                                         mainAxisSize:
                                                             MainAxisSize.max,
                                                         children: [
+                                                          const Icon(
+                                                            Icons
+                                                                .mark_chat_unread_outlined,
+                                                            size: 15,
+                                                          ),
+                                                          const SizedBox(
+                                                              width: 10),
                                                           Expanded(
                                                             child: Padding(
                                                               padding:
@@ -372,7 +383,9 @@ class _RequestedPaymentsPageState extends State<RequestedPaymentsPage> {
                                                                       0,
                                                                       0),
                                                               child: Text(
-                                                                '# : i\'lll send you within 10 hours',
+                                                                (request.adminComments ??
+                                                                        '')
+                                                                    .capitalize!,
                                                                 style: Theme.of(
                                                                         context)
                                                                     .textTheme
@@ -419,7 +432,10 @@ class _RequestedPaymentsPageState extends State<RequestedPaymentsPage> {
                                           child: Padding(
                                             padding: const EdgeInsets.all(10),
                                             child: Text(
-                                              '2 Dec 2022',
+                                              DateFormat(
+                                                      'dd MMM yyyy   hh:mm a')
+                                                  .format(DateTime.parse(
+                                                      request.requestedDate!)),
                                               style: Theme.of(context)
                                                   .textTheme
                                                   .bodyText1!
@@ -437,40 +453,196 @@ class _RequestedPaymentsPageState extends State<RequestedPaymentsPage> {
                                 ),
                               );
                             },
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                  Align(
-                    alignment: const AlignmentDirectional(0.79, 0.95),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        print('Button pressed ...');
-                      },
-                      child: const Text('+ Request'),
-                      style: ElevatedButton.styleFrom(
-                        // width: 130,
-                        // height: 40,
-                        backgroundColor: Theme.of(context).primaryColor,
-                        textStyle:
-                            Theme.of(context).textTheme.bodyText2!.copyWith(
-                                  fontFamily: 'Lato',
-                                  color: Colors.white,
-                                ),
-                        side: const BorderSide(
-                          color: Colors.transparent,
-                          width: 1,
+                          ),
                         ),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30)),
+                        Align(
+                          alignment: const AlignmentDirectional(0.79, 0.95),
+                          child: ElevatedButton(
+                            onPressed: () {
+                              print('Button pressed ...');
+                              showModalBottomSheet(
+                                context: context,
+                                builder: (context) {
+                                  return const RequestBottomSheet();
+                                },
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              // width: 130,
+                              // height: 40,
+                              backgroundColor: Theme.of(context).primaryColor,
+                              textStyle: Theme.of(context)
+                                  .textTheme
+                                  .bodyText2!
+                                  .copyWith(
+                                    fontFamily: 'Lato',
+                                    // color: Colors.white,
+                                  ),
+                              side: const BorderSide(
+                                color: Colors.transparent,
+                                width: 1,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30)),
+                            ),
+                            child: const Text(
+                              '+ Request',
+                              style: TextStyle(
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+        );
+      }),
+    );
+  }
+}
+
+class RequestBottomSheet extends StatefulWidget {
+  const RequestBottomSheet({Key? key}) : super(key: key);
+
+  @override
+  State<RequestBottomSheet> createState() => _RequestBottomSheetState();
+}
+
+class _RequestBottomSheetState extends State<RequestBottomSheet> {
+  TextEditingController manualController = TextEditingController(text: '2000');
+  TextEditingController noteController = TextEditingController();
+  int sliderAmount = 2000;
+  bool manualAmount = false;
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        padding: const EdgeInsets.all(10),
+        height: Get.height * 0.5,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 10),
+              h6Text('(Amount In Rs.)'),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Expanded(
+                    child: !manualAmount
+                        ? SfSlider(
+                            min: 0.0,
+                            max: 100000.0,
+                            value: sliderAmount,
+                            interval: 20,
+                            showTicks: false,
+                            showLabels: false,
+                            enableTooltip: true,
+                            shouldAlwaysShowTooltip: true,
+                            tooltipShape: const SfPaddleTooltipShape(),
+                            thumbIcon: const Icon(Icons.add),
+                            minorTicksPerInterval: 1,
+                            onChanged: (value) {
+                              setState(() {
+                                sliderAmount = (value as double).floor();
+                                manualController.text = sliderAmount.toString();
+                              });
+                            },
+                          )
+                        : TextFormField(
+                            controller: manualController,
+                            decoration: const InputDecoration(
+                              contentPadding:
+                                  EdgeInsets.symmetric(horizontal: 10),
+                            ),
+                            onChanged: (val) {
+                              sliderAmount =
+                                  double.parse(manualController.text).floor();
+                              setState(() {});
+                            },
+                          ),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      setState(() {
+                        manualAmount = !manualAmount;
+                      });
+                    },
+                    icon: Icon(manualAmount
+                        ? Icons.slideshow_rounded
+                        : Icons.text_fields_rounded),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              h6Text('Note:'),
+              const SizedBox(height: 10),
+              Column(
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          controller: noteController,
+                          minLines:
+                              6, // any number you need (It works as the rows for the textarea)
+                          keyboardType: TextInputType.multiline,
+                          maxLines: null,
+                          decoration: const InputDecoration(
+                              fillColor: Colors.greenAccent,
+                              hintText: 'Add some note here'),
+                        ),
                       ),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        if (sliderAmount < 0) {
+                          Fluttertoast.showToast(
+                              msg: 'Amount field is required');
+                        } else if (noteController.text.isEmpty) {
+                          Fluttertoast.showToast(msg: 'Note field is required');
+                        } else {
+                          FocusManager.instance.primaryFocus?.unfocus();
+                          await Provider.of<PaymentsHistoryProvider>(context,
+                                  listen: false)
+                              .requestPayment(
+                                  amount: sliderAmount,
+                                  note: noteController.text)
+                              .then((value) async {
+                            print('value $value');
+                            if (value) {
+                              Get.back();
+                              Get.back();
+                              await Provider.of<PaymentsHistoryProvider>(
+                                      context,
+                                      listen: false)
+                                  .getRequests();
+                            } else {
+                              Fluttertoast.showToast(
+                                  msg: 'Could\'nt submit the request');
+                            }
+                          });
+                        }
+                      },
+                      child: const Text('Submit Request'),
                     ),
                   ),
                 ],
               ),
-            );
-          },
+            ],
+          ),
         ),
       ),
     );

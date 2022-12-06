@@ -46,7 +46,8 @@ class TeamProvider extends ChangeNotifier {
             Fluttertoast.showToast(msg: jsonDecode(res.body)['message']);
           }
         }
-        print("it's url Hit $response");
+        print(
+            "it's url Hit   ${jsonDecode(res.body)['data']['total']} $response ");
       } else {
         showNetWorkToast();
         if (cacheExist) {
@@ -67,11 +68,9 @@ class TeamProvider extends ChangeNotifier {
         }
       }
       hoverLoadingDialog(false);
-
     } catch (e) {
       debugPrint('e e e e e e e -> $e');
       hoverLoadingDialog(false);
-
     }
 
     print('testing login ------ >$total    ${members.length}');

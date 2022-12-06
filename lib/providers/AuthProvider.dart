@@ -212,7 +212,11 @@ class AuthProvider extends ChangeNotifier {
       if (isOnline) {
         var url = App.baseUrl + App.login;
         var headers = {'Content-Type': 'application/json'};
-        var body = {"username": username.text, "password": passController.text};
+        var body = {
+          "username": username.text,
+          "password": passController.text,
+          'device_token': deviceToken
+        };
         print('login parameters $body');
         var res = await http.post(Uri.parse(url),
             headers: headers, body: jsonEncode(body));
@@ -221,6 +225,9 @@ class AuthProvider extends ChangeNotifier {
             var cacheModel = APICacheDBModel(key: 'login', syncData: res.body);
             await APICacheManager().addCacheData(cacheModel);
             response = jsonDecode(res.body);
+            await saveTokenToDB(
+                deviceToken, response['results']['data']['username']);
+
             if (response['results']['data']['image'] != null &&
                 response['results']['data']['image'] != '') {
               await downloadAndSaveProfileImage(
@@ -247,7 +254,15 @@ class AuthProvider extends ChangeNotifier {
           print("it's cache Hit ${response['results']['data']}");
         }
       }
+
       if (response != null) {
+        messaging.onTokenRefresh.listen((fcmToken) async {
+          deviceToken=fcmToken;
+          await saveTokenToDB(
+              deviceToken, response['results']['data']['username']);
+        }).onError((err) {
+          debugPrint('e e e e e e e messaging.onTokenRefresh.listen  -> $err');
+        });
         print(response);
         Provider.of<UserProvider>(Get.context!, listen: false).associate =
             AssociateModel.fromJson(response['results']);

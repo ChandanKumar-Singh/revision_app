@@ -8,9 +8,9 @@ import 'package:revision/screens/pages/myPaidPayments.dart';
 
 import '../../constants/widgets.dart';
 import '../pages/myTeam.dart';
-import '../pages/paymentRequests/paymentRequests.dart';
-import '../pages/paymentRequests/recievedPayment.dart';
-import '../pages/paymentRequests/withdrawalPayment.dart';
+import '../pages/paymentHistory/paymentRequests.dart';
+import '../pages/paymentHistory/recievedPayment.dart';
+import '../pages/paymentHistory/withdrawalPayment.dart';
 
 class DrawerList extends StatefulWidget {
   const DrawerList({Key? key}) : super(key: key);

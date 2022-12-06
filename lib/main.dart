@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -8,18 +9,25 @@ import 'package:provider/provider.dart';
 import 'package:revision/FCM/fcmMethods.dart';
 import 'package:revision/constants/app.dart';
 import 'package:revision/providers/AuthProvider.dart';
+import 'package:revision/providers/PaymentsHistoryProvider.dart';
 import 'package:revision/providers/ThemeProvider.dart';
 import 'package:revision/providers/UserProvider.dart';
+import 'package:revision/providers/paidPaymentsProvider.dart';
 import 'package:revision/providers/teamCcontroller.dart';
 import 'package:revision/screens/auth/launchScreen.dart';
+import 'package:revision/screens/pages/Notification/NotificationsPage.dart';
 
 import 'functions.dart';
 
-Future<void> _firebaseMessagingBGHandler(RemoteMessage message) async {
-  // print(message.toString());
-  // print(
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+
+  await FCM().showNotification(message);
+  // debugPrint(message.toString());
+  // debugPrint(
   //     "--------------------- On Message ${message.data.toString()} --------------");
-  // print(
+  // debugPrint(
   //     "OnMessage: ${message.notification?.title}/${message.notification?.body}");
   // if (message.data['pageInfo'] != null) {
   //   var payLoadTitle =
@@ -31,15 +39,17 @@ Future<void> _firebaseMessagingBGHandler(RemoteMessage message) async {
   //   await DatabaseHelper.db();
   //   await DatabaseHelper.createItem(jsonEncode(payLoadTitle.toJson()));
   //   var items = await DatabaseHelper.getItems();
-  //   print(items.last);
+  //   debugPrint(items.last);
   // } else {
-  print('Handling admin-teacher side bg messages');
   // }
-
-  // print('Handling a background message ${message.messageId}');
+  debugPrint('Handling a background message ${message.messageId}');
+  debugPrint('Notification Message: ${message.data}');
 }
 
 Future<void> onMessageOpenedApp(RemoteMessage message) async {
+  await FCM().initFCM();
+  Get.to(const NotificationsPage());
+
   // if (message.data['is_redirect'] == 'Admin') {
   //   Get.to(NotificationPage());
   // } else {
@@ -55,21 +65,18 @@ Future<void> onMessageOpenedApp(RemoteMessage message) async {
   //     student: payLoadTitle.student!,
   //   ));
   // }
-  print(
+  debugPrint(
       "--------------------- onMessageOpenedApp ${message.data.toString()} --------------");
 }
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  // await setupFCM();
-  // await initFCM();
-  // FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   await FCM().getToken();
-  await FCM().initInfo();
+  await FCM().initFCM();
   RemoteMessage? initialMessage =
       await FirebaseMessaging.instance.getInitialMessage();
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBGHandler);
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   if (initialMessage != null) {
     firebaseMessagingBackgroundHandler(initialMessage);
   }
@@ -89,6 +96,8 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => UserProvider()),
         ChangeNotifierProvider(create: (context) => ThemeProvider()),
         ChangeNotifierProvider(create: (context) => TeamProvider()),
+        ChangeNotifierProvider(create: (context) => PaidPaymentsProvider()),
+        ChangeNotifierProvider(create: (context) => PaymentsHistoryProvider()),
       ],
       child: ScreenUtilInit(
           designSize: Size(Get.width, Get.height),

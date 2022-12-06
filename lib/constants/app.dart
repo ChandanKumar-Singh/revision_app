@@ -7,6 +7,15 @@ class App{
   static const String login='login';
   static const String forgetPassword='forgetPassword';
   static const String getTeamMembers='getTeamMembers';
+  static const String paymentHistory='paymentHistory';
+
+  ///payment history
+  static const String withdrawalPayments='withdrawalPayments';
+  static const String recievedPayments='recievedPayments';
+  static const String requestedPayments='requestedPayments';
+  static const String addPaymentRequest='addPaymentRequest';
+
+  ///credentials
   static const String updatePassword='updatePassword';
   static const String profileUpdatePassword='profileUpdatePassword';
   static const String updateProfileImage='updateProfileImage';

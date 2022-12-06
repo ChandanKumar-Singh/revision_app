@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:api_cache_manager/api_cache_manager.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -29,6 +30,7 @@ import 'constants/widgets.dart';
 
 ///FCM
 FirebaseMessaging messaging = FirebaseMessaging.instance;
+var deviceToken;
 String fcmWebServerKey =
     'AAAAUpjhLsk:APA91bGmCC8UZOsc9BPjjHceQaJIce-6ahoOXCT6b5uTuUZQIlaS4FB1s7FQrjkDb4m-Q68YBlKbZ9JCuTIspoQ3-QmG_YvyC8g9X0VID5m4dUEzbPYMycys3uVKEVuq77QaupJRQZgj';
 
@@ -110,14 +112,16 @@ Future<void> initFCM() async {
     }
   });
 
-  ///getToken
-  String? token = await messaging.getToken(
-      // vapidKey: fcmWebServerKey,
-      );
-
-  print('Fcm deviceToken is: ${token}');
 }
 
+Future<void> saveTokenToDB(String token,String id) async {
+
+  await FirebaseFirestore.instance
+      .collection(App.appname)
+      .doc(id)
+      .set({'token': token})
+      .then((value) => debugPrint('Token saved to both Laravel Db'));
+}
 
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print("Handling a background message: ${message.messageId}");

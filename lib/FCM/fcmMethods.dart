@@ -1,17 +1,16 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-
+import 'package:get/get.dart';
 
 import '../constants/app.dart';
 import '../functions.dart';
-
+import '../screens/pages/Notification/NotificationsPage.dart';
 
 class FCM {
-  var deviceToken;
   Future<void> requestPermission() async {
-    FirebaseMessaging messaging = FirebaseMessaging.instance;
+    messaging = FirebaseMessaging.instance;
     NotificationSettings settings = await messaging.requestPermission(
       alert: true,
       announcement: false,
@@ -21,41 +20,30 @@ class FCM {
       provisional: false,
       sound: true,
     );
+
+    flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.requestPermission();
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      print('User granted permission');
+      print('User granted NotificationSettings permission');
     } else if (settings.authorizationStatus ==
         AuthorizationStatus.provisional) {
-      print('User granted provisional permission');
+      print('User granted NotificationSettings provisional permission');
     } else {
-      print('User declined or has not accepted permission');
+      print(
+          'User declined or has not accepted NotificationSettings permission');
     }
   }
 
   Future<void> getToken() async {
-    await FirebaseMessaging.instance.getToken().then((token) {
+    await messaging.getToken().then((token) {
       deviceToken = token;
       print("My device FCM token is $deviceToken");
     });
-    await saveTokenToDB(deviceToken)
-        .then((value) => print('FCM token saved for this user'));
   }
 
-  Future<void> saveTokenToDB(String token) async {
-  //   var prefs = await SharedPreferences.getInstance();
-  //   TeacherModel teacher =
-  //       TeacherModel.fromJson(jsonDecode(prefs.getString('teacher')!));
-  //
-    await FirebaseFirestore.instance
-        .collection(App.appname)
-
-        .doc('10')
-        .set({'token': token})
-        // .then((value) => saveTokenToLaravel(
-        //     type: 'teacher', id: teacher.data!.userId!, fcmToken: token))
-        .then((value) => print('Token saved to both DB'));
-  }
-
-  Future<void> initInfo() async {
+  Future<void> initFCM() async {
     await requestPermission();
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/launcher_icon');
@@ -66,12 +54,21 @@ class FCM {
       android: initializationSettingsAndroid,
       iOS: iOSInitialize,
     );
+    RemoteMessage? initialMessage =
+        await FirebaseMessaging.instance.getInitialMessage();
 
     ///select notification action
 
-    flutterLocalNotificationsPlugin.initialize(initializationSettings);
-        // onSelectNotification: (String? payload) async {
-          /*
+    flutterLocalNotificationsPlugin.initialize(initializationSettings,
+        onDidReceiveNotificationResponse:
+            (NotificationResponse notificationResponse) {
+      Get.to(const NotificationsPage());
+    });
+    final NotificationAppLaunchDetails? notificationAppLaunchDetails =
+        await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
+
+    // onSelectNotification: (String? payload) async {
+    /*
       try {
         if (payload != null && payload.isNotEmpty) {
           print('This is payload from notification $payload');
@@ -111,6 +108,7 @@ class FCM {
       print("--------------------- On Message --------------");
       print(
           "--------------------- On Message ${message.data.toString()} --------------");
+      await showNotification(message);
 
       // if (message.data['is_redirect'] == 'Admin') {
       //   print('Listening admin-teacher side  messages');
@@ -143,40 +141,56 @@ class FCM {
       //     .addPayloadToLocalSql(payLoadTitle);
       // Provider.of<FCMNotificationsProvider>(Get.context!, listen: false)
       //     .getPayloads();
-
-      BigTextStyleInformation bigTextStyleInformation = BigTextStyleInformation(
-          !message.notification!.body!
-                  .contains('https://firebasestorage.googleapis.com/')
-              ? message.notification!.body.toString()
-              : "📷 Image",
-          htmlFormatBigText: true,
-          contentTitle: message.notification!.title.toString(),
-          htmlFormatContentTitle: true);
-      AndroidNotificationDetails androidNotificationDetails =
-          AndroidNotificationDetails(
-        App.appname,
-        App.appname,
-        importance: Importance.max,
-        styleInformation: bigTextStyleInformation,
-        priority: Priority.max,
-        playSound: true,
-        // sound: RawResourceAndroidNotificationSound('.mp3') for custom sound  --- put mp3 file in  main/res/raw/   folder
-      );
-      NotificationDetails notificationDetails = NotificationDetails(
-        android: androidNotificationDetails,
-        iOS: DarwinNotificationDetails(),
-      );
-      await flutterLocalNotificationsPlugin.show(
-          0,
-          message.notification?.title,
-          !message.notification!.body!
-                  .contains('https://firebasestorage.googleapis.com/')
-              ? message.notification!.body.toString()
-              : "📷 Image",
-          notificationDetails,
-          // payload: message.data['pageInfo'] ?? message.data['is_redirect'],
-      );
     });
+  }
+
+  Future<void> showNotification(RemoteMessage message) async {
+    BigTextStyleInformation bigTextStyleInformation = BigTextStyleInformation(
+        !message.notification!.body!
+                .contains('https://firebasestorage.googleapis.com/')
+            ? message.notification!.body.toString()
+            : "📷 Image",
+        htmlFormatBigText: true,
+        contentTitle: message.notification!.title.toString(),
+        htmlFormatContentTitle: true);
+    AndroidNotificationDetails androidNotificationDetails =
+        AndroidNotificationDetails(
+      App.appname,
+      App.appname,
+      importance: Importance.max,
+      styleInformation: bigTextStyleInformation,
+      priority: Priority.max,
+      playSound: true,
+      // sound: RawResourceAndroidNotificationSound('.mp3') for custom sound  --- put mp3 file in  main/res/raw/   folder
+    );
+    NotificationDetails notificationDetails = NotificationDetails(
+      android: androidNotificationDetails,
+      iOS: DarwinNotificationDetails(),
+    );
+    await flutterLocalNotificationsPlugin.show(
+      0,
+      message.notification?.title,
+      !message.notification!.body!
+              .contains('https://firebasestorage.googleapis.com/')
+          ? message.notification!.body.toString()
+          : "📷 Image",
+      notificationDetails,
+      // payload: message.data['pageInfo'] ?? message.data['is_redirect'],
+    );
+    await FirebaseFirestore.instance
+        .collection(App.appname)
+        .doc('10')
+        .collection('notifications')
+        .doc(DateTime.now().toString())
+        .set({
+          'header': 'Hiii , This is header',
+          'description': 'THis is description',
+          'isRead': false,
+          'timestamp': DateTime.now().toString()
+        })
+        .then((value) => debugPrint('Notification saved to Firestore at id 10'))
+        .onError((error, stackTrace) => print(
+            ' Could not save the notification on firestore at id 10 ---> $error'));
   }
 
   // void sendPushMessage(
