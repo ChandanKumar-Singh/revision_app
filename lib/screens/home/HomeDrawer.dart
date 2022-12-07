@@ -47,7 +47,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
               children: [
                 Container(
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary.withOpacity(0.9),
+                    color: Theme.of(context).colorScheme.primary.withOpacity(1),
                   ),
                   height: kToolbarHeight * 2.2,
                   child: Column(
@@ -85,8 +85,10 @@ class _HomeDrawerState extends State<HomeDrawer> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  h6Text('${widget.up.associate.data!.fullName}',
-                                      maxLine: 2, color: Colors.white),
+                                  h6Text(
+                                      '${widget.up.associate.data!.fullName}',
+                                      maxLine: 2,
+                                      color: Colors.white),
                                   b1Text(widget.up.associate.data!.email ?? '',
                                       color: Colors.white),
                                 ],
@@ -110,8 +112,10 @@ class _HomeDrawerState extends State<HomeDrawer> {
                                 .toogleBrt();
                             widget.onChangeTheme();
                           },
-                          icon:  Icon(
-                           Theme.of(context).brightness==Brightness.dark? Icons.dark_mode:Icons.light_mode,
+                          icon: Icon(
+                            Theme.of(context).brightness == Brightness.dark
+                                ? Icons.dark_mode
+                                : Icons.light_mode,
                             color: Colors.white,
                           )),
                     ))
@@ -148,7 +152,8 @@ class _HomeDrawerState extends State<HomeDrawer> {
                               children: [
                                 Expanded(
                                     child: b1Text('Notice',
-                                        textAlign: TextAlign.center, maxLine: 1)),
+                                        textAlign: TextAlign.center,
+                                        maxLine: 1)),
                               ],
                             ),
                           ],
@@ -173,7 +178,8 @@ class _HomeDrawerState extends State<HomeDrawer> {
                               children: [
                                 Expanded(
                                     child: b1Text('Activities',
-                                        textAlign: TextAlign.center, maxLine: 1)),
+                                        textAlign: TextAlign.center,
+                                        maxLine: 1)),
                               ],
                             ),
                           ],
@@ -198,7 +204,8 @@ class _HomeDrawerState extends State<HomeDrawer> {
                               children: [
                                 Expanded(
                                     child: b1Text('Notice',
-                                        textAlign: TextAlign.center, maxLine: 1)),
+                                        textAlign: TextAlign.center,
+                                        maxLine: 1)),
                               ],
                             ),
                           ],

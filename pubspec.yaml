@@ -74,6 +74,7 @@ dependencies:
   syncfusion_flutter_charts: ^20.3.59
   fl_chart: ^0.55.2
   syncfusion_flutter_gauges: ^20.3.59
+  flutter_phone_direct_caller: ^2.1.1
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -1,9 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:revision/constants/app.dart';
 import 'package:revision/constants/widgets.dart';
 import 'package:revision/providers/ThemeProvider.dart';
 import 'package:revision/providers/UserProvider.dart';
@@ -98,11 +100,15 @@ class MyCustomUIState extends State<MyCustomUI>
   }
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
-
+  bool checkingSales = false;
+  bool checkingIncome = false;
+  bool checkingWallet = false;
+  bool showPrices = true;
+  double _height = 0;
   @override
   Widget build(BuildContext context) {
     double w = MediaQuery.of(context).size.width;
-    double heignt = Get.height;
+    double height = Get.height;
 
     return Consumer<UserProvider>(builder: (context, up, _) {
       return Scaffold(
@@ -140,12 +146,25 @@ class MyCustomUIState extends State<MyCustomUI>
                       },
                     ),
                     Expanded(
-                      child: h5Text(
-                        // App.appname,
-                        'Dashboard',
-
-                        fontWeight: FontWeight.bold,
-                      ),
+                      child: Builder(builder: (context) {
+                        var fname = App.appname.split(' ').first;
+                        var lnames = App.appname.split(' ');
+                        lnames.removeAt(0);
+                        var lname = lnames.join(' ');
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            h5Text(
+                              fname,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            capText(
+                              lname,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ],
+                        );
+                      }),
                     ),
                     Row(
                       children: [
@@ -164,7 +183,7 @@ class MyCustomUIState extends State<MyCustomUI>
         ),
         drawer: HomeDrawer(
             scaffoldKey: _scaffoldKey,
-            height: heignt,
+            height: height,
             up: up,
             onChangeTheme: () {
               Timer(const Duration(milliseconds: 500), () {
@@ -187,6 +206,232 @@ class MyCustomUIState extends State<MyCustomUI>
                   child: Column(
                     children: [
                       SizedBox(height: w / 13),
+                      // Tooltip(
+                      //   // message: 'Call Me',
+                      //   richMessage:TextSpan(text: 'hhhhhhhhhhhh'),
+                      //   triggerMode: TooltipTriggerMode.tap,
+                      //   preferBelow: false,
+                      //
+                      //   child: ElevatedButton(
+                      //
+                      //     onPressed: () async {
+                      //       const number = '+919135324545';
+                      //       bool? res =
+                      //           await FlutterPhoneDirectCaller.callNumber(number)
+                      //               ;
+                      //       print('res    $res   99999');
+                      //     },
+                      //     child: Text('call'),
+                      //   ),
+                      // ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            SizedBox(
+                              width: Get.width / 6,
+                              child: GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    checkingSales = !checkingSales;
+                                    if (checkingSales) {
+                                      checkingIncome = false;
+                                      checkingWallet = false;
+                                    }
+                                    if (checkingSales ||
+                                        checkingIncome ||
+                                        checkingWallet) {
+                                      _height = 200;
+                                    }
+                                  });
+                                },
+                                child: Column(
+                                  children: [
+                                    Image.asset(
+                                      'assets/sales.png',
+                                      color: Theme.of(context).brightness ==
+                                              Brightness.dark
+                                          ? Colors.white
+                                          : Theme.of(context)
+                                              .colorScheme
+                                              .primary,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              width: Get.width / 5,
+                              child: GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    checkingIncome = !checkingIncome;
+                                    if (checkingIncome) {
+                                      checkingSales = false;
+                                      checkingWallet = false;
+                                    }
+                                    if (checkingSales ||
+                                        checkingIncome ||
+                                        checkingWallet) {
+                                      _height = 200;
+                                    }
+                                  });
+                                },
+                                child: Column(
+                                  children: [
+                                    Image.asset(
+                                      'assets/income.png',
+                                      color: Theme.of(context).brightness ==
+                                              Brightness.dark
+                                          ? Colors.white
+                                          : Theme.of(context)
+                                              .colorScheme
+                                              .primary,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              width: Get.width / 7,
+                              child: GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    checkingWallet = !checkingWallet;
+                                    if (checkingWallet) {
+                                      checkingIncome = false;
+                                      checkingSales = false;
+                                    }
+                                    if (checkingSales ||
+                                        checkingIncome ||
+                                        checkingWallet) {
+                                      _height = 200;
+                                    }
+                                  });
+                                },
+                                child: Column(
+                                  children: [
+                                    Image.asset(
+                                      'assets/wallet.png',
+                                      color: Theme.of(context).brightness ==
+                                              Brightness.dark
+                                          ? Colors.white
+                                          : Theme.of(context)
+                                              .colorScheme
+                                              .primary,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // if (checkingSales || checkingIncome || checkingWallet)
+                      AnimatedContainer(
+                        width: double.infinity,
+                        height:
+                            checkingWallet || checkingIncome || checkingSales
+                                ? 75.0
+                                : 0.0,
+                        // color: checkingWallet || checkingIncome || checkingSales
+                        //     ? Colors.red
+                        //     : Colors.blue,
+                        onEnd: () {
+                          setState(() {
+                            showPrices = false;
+                          });
+                          debugPrint('showPrices --->$showPrices');
+                        },
+                        duration: const Duration(seconds: 2),
+                        curve: Curves.fastOutSlowIn,
+                        child: AspectRatio(
+                          aspectRatio: 16 / 9,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              if (showPrices)
+                                SizedBox(
+                                  width: Get.width / 4,
+                                  child: Column(
+                                    children: [
+                                      if (checkingSales && showPrices)
+                                        Column(
+                                          children: [
+                                            Row(
+                                              children: const [
+                                                Expanded(
+                                                  child: Text(
+                                                    '₹@00rrrrrrrrr 0000',
+                                                    maxLines: 4,
+                                                    textAlign: TextAlign.center,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                              SizedBox(
+                                width: Get.width / 4,
+                                child: Column(
+                                  children: [
+                                    if (checkingIncome && showPrices)
+                                      Column(
+                                        children: [
+                                          Row(
+                                            children: const [
+                                              Expanded(
+                                                child: Text(
+                                                  '₹@00rrrrrrrrrrrrr 0000',
+                                                  maxLines: 3,
+                                                  textAlign: TextAlign.center,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(
+                                width: Get.width / 4,
+                                child: Column(
+                                  children: [
+                                    if (checkingWallet && showPrices)
+                                      Column(
+                                        children: [
+                                          Row(
+                                            children: const [
+                                              Expanded(
+                                                child: Text(
+                                                  '₹@00rrrrrrrrrrrrr0000',
+                                                  maxLines: 3,
+                                                  textAlign: TextAlign.center,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      // const SizedBox(height: 30),
                       Row(
                         children: [
                           h6Text(
@@ -423,7 +668,7 @@ class MyCustomUIState extends State<MyCustomUI>
                   ),
                 ),
                 SizedBox(
-                  height: 200,
+                  height: 210,
                   child: ListView.builder(
                       padding: const EdgeInsets.symmetric(horizontal: 15),
                       scrollDirection: Axis.horizontal,
@@ -452,17 +697,23 @@ class MyCustomUIState extends State<MyCustomUI>
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: h6Text(
-                                          'Smart Phone oro erut  ere epr effe ',
-                                          maxLine: 3,
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 8.0),
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                              'Smart Phone o r o e ru  t  ere epr effe ',
+                                              maxLines: 3,
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: Get.theme.textTheme
+                                                    .headline6!.fontSize,
+                                                fontWeight: FontWeight.bold,
+                                              )),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
                                   Column(
                                     children: [
@@ -486,7 +737,7 @@ class MyCustomUIState extends State<MyCustomUI>
                                           ),
                                           Expanded(
                                             child: h6Text(
-                                              '300000',
+                                              '300vgve 000',
                                               maxLine: 2,
                                               color: Colors.white,
                                               fontWeight: FontWeight.bold,
@@ -970,7 +1221,7 @@ class _DashBoardCircleProgressState extends State<DashBoardCircleProgress> {
         //     gradient: SweepGradient(
         //         colors: <Color>[Color(0xFF00a9b5), Color(0xFFa4edeb)],
         //          stops: <double>[0.25, 0.75])),
-        pointers: <GaugePointer>[const RangePointer(value: 20)],
+        pointers: const <GaugePointer>[RangePointer(value: 20)],
 
         //     annotations: <GaugeAnnotation>[
         //   GaugeAnnotation(
@@ -1189,7 +1440,7 @@ class _DashBoardCircleProgressState extends State<DashBoardCircleProgress> {
                     gradient: SweepGradient(colors: <Color>[
                       Theme.of(context).colorScheme.primary,
                       Theme.of(context).colorScheme.secondary,
-                    ], stops: <double>[
+                    ], stops: const <double>[
                       0.25,
                       0.75
                     ])),

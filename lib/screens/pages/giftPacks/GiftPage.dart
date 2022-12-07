@@ -88,7 +88,7 @@ class _GiftPageState extends State<GiftPage> {
                 Row(
                   children: [
                     Expanded(
-                      child: b1Text('You have unlocked these gifts.',
+                      child: h6Text('You have unlocked these gifts.',
                           textAlign: TextAlign.center, color: Colors.white),
                     ),
                   ],
@@ -134,9 +134,9 @@ class _GiftPageState extends State<GiftPage> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    b1Text(fromDate),
-                                    b1Text('-'),
-                                    b1Text(toDate),
+                                    h6Text(fromDate),
+                                    h6Text('-'),
+                                    h6Text(toDate),
                                     Container(
                                       height: 25,
                                       width: 25,
@@ -164,7 +164,7 @@ class _GiftPageState extends State<GiftPage> {
                                     horizontal: 8.0, vertical: 5),
                                 child: Row(
                                   children: [
-                                    b1Text(
+                                    h6Text(
                                       'Total Business : ',
                                       textAlign: TextAlign.center,
                                     ),
@@ -172,7 +172,7 @@ class _GiftPageState extends State<GiftPage> {
                                       Icons.currency_rupee_rounded,
                                       size: 15,
                                     ),
-                                    b1Text(
+                                    h6Text(
                                       '5000000.00',
                                       textAlign: TextAlign.center,
                                     ),
@@ -202,7 +202,7 @@ class _GiftPageState extends State<GiftPage> {
                                 child: Row(
                                   children: [
                                     Expanded(
-                                      child: b1Text(
+                                      child: h6Text(
                                         '# testing ',
                                         textAlign: TextAlign.left,
                                       ),
@@ -217,7 +217,7 @@ class _GiftPageState extends State<GiftPage> {
                                 child: Row(
                                   children: [
                                     Expanded(
-                                      child: b1Text(
+                                      child: h6Text(
                                         'Your gift has released on $expiryDate',
                                         textAlign: TextAlign.center,
                                       ),

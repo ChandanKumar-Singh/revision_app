@@ -33,8 +33,7 @@ class _DrawerListState extends State<DrawerList> {
                 child: ListTile(
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10)),
-                  tileColor:
-                      Theme.of(context).colorScheme.primary.withOpacity(0.6),
+                  tileColor: Theme.of(context).colorScheme.primary,
                   onTap: () {
                     Get.to(const UserslistWidget());
                   },
@@ -62,8 +61,7 @@ class _DrawerListState extends State<DrawerList> {
                   onTap: () {
                     Get.to(const MyPaidPaymentsWidget());
                   },
-                  tileColor:
-                      Theme.of(context).colorScheme.primary.withOpacity(0.6),
+                  tileColor: Theme.of(context).colorScheme.primary,
                   hoverColor: Colors.red,
                   selectedColor: Colors.red,
                   title: Text(
@@ -86,9 +84,9 @@ class _DrawerListState extends State<DrawerList> {
                   borderRadius: BorderRadius.circular(10),
                   child: ExpansionTile(
                     backgroundColor:
-                        Theme.of(context).colorScheme.primary.withOpacity(0.5),
+                        Theme.of(context).colorScheme.primary.withOpacity(1),
                     collapsedBackgroundColor:
-                        Theme.of(context).colorScheme.primary.withOpacity(0.6),
+                        Theme.of(context).colorScheme.primary,
                     collapsedIconColor: Colors.white,
                     title: Text(
                       'My Income',
@@ -97,7 +95,10 @@ class _DrawerListState extends State<DrawerList> {
                           .headline6!
                           .copyWith(color: Colors.white),
                     ),
-                    leading: const Icon(Icons.monetization_on),
+                    leading: const Icon(
+                      Icons.monetization_on,
+                      color: Colors.white,
+                    ),
                     children: [
                       ListTile(
                         onTap: () {
@@ -113,7 +114,10 @@ class _DrawerListState extends State<DrawerList> {
                                 .copyWith(color: Colors.white),
                           ),
                         ),
-                        leading: const Icon(Icons.assistant_direction,color: Colors.white,),
+                        leading: const Icon(
+                          Icons.assistant_direction,
+                          color: Colors.white,
+                        ),
                       ),
                       ListTile(
                         onTap: () {},
@@ -126,7 +130,10 @@ class _DrawerListState extends State<DrawerList> {
                               .headline6!
                               .copyWith(color: Colors.white),
                         ),
-                        leading: const Icon(Icons.share_arrival_time_outlined,color: Colors.white,),
+                        leading: const Icon(
+                          Icons.share_arrival_time_outlined,
+                          color: Colors.white,
+                        ),
                       ),
                       ListTile(
                         onTap: () {
@@ -139,7 +146,10 @@ class _DrawerListState extends State<DrawerList> {
                               .headline6!
                               .copyWith(color: Colors.white),
                         ),
-                        leading: const Icon(Icons.card_giftcard_rounded,color: Colors.white,),
+                        leading: const Icon(
+                          Icons.card_giftcard_rounded,
+                          color: Colors.white,
+                        ),
                       ),
                     ],
                   ),
@@ -152,11 +162,14 @@ class _DrawerListState extends State<DrawerList> {
                   borderRadius: BorderRadius.circular(10),
                   child: ExpansionTile(
                     backgroundColor:
-                        Theme.of(context).colorScheme.primary.withOpacity(0.5),
+                        Theme.of(context).colorScheme.primary.withOpacity(1),
                     collapsedBackgroundColor:
-                        Theme.of(context).colorScheme.primary.withOpacity(0.6),
+                        Theme.of(context).colorScheme.primary,
                     collapsedIconColor: Colors.white,
-                    leading: const Icon(Icons.monetization_on),
+                    leading: const Icon(
+                      Icons.monetization_on,
+                      color: Colors.white,
+                    ),
                     title: Text(
                       'Payments History',
                       style: Theme.of(context)
@@ -173,7 +186,10 @@ class _DrawerListState extends State<DrawerList> {
                           'Received',
                           color: Colors.white,
                         ),
-                        leading: const Icon(Icons.move_to_inbox_rounded,color: Colors.white,),
+                        leading: const Icon(
+                          Icons.move_to_inbox_rounded,
+                          color: Colors.white,
+                        ),
                       ),
                       ListTile(
                         onTap: () {
@@ -188,7 +204,10 @@ class _DrawerListState extends State<DrawerList> {
                               .headline6!
                               .copyWith(color: Colors.white),
                         ),
-                        leading: const Icon(Icons.request_quote_outlined,color: Colors.white,),
+                        leading: const Icon(
+                          Icons.request_quote_outlined,
+                          color: Colors.white,
+                        ),
                       ),
                       ListTile(
                         onTap: () {
@@ -203,7 +222,10 @@ class _DrawerListState extends State<DrawerList> {
                               .headline6!
                               .copyWith(color: Colors.white),
                         ),
-                        leading: const Icon(Icons.price_check_outlined,color: Colors.white,),
+                        leading: const Icon(
+                          Icons.price_check_outlined,
+                          color: Colors.white,
+                        ),
                       ),
                     ],
                   ),

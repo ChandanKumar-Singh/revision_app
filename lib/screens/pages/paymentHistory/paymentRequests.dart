@@ -534,31 +534,34 @@ class _RequestBottomSheetState extends State<RequestBottomSheet> {
               Row(
                 children: [
                   Expanded(
-                    child: !manualAmount
-                        ? SfSlider(
-                            min: 0.0,
-                            max: 100000.0,
-                            value: sliderAmount,
-                            interval: 20,
-                            showTicks: false,
-                            showLabels: false,
-                            enableTooltip: true,
-                            shouldAlwaysShowTooltip: true,
-                            tooltipShape: const SfPaddleTooltipShape(),
-                            thumbIcon: const Icon(Icons.add),
-                            minorTicksPerInterval: 1,
-                            onChanged: (value) {
-                              setState(() {
-                                sliderAmount = (value as double).floor();
-                                manualController.text = sliderAmount.toString();
-                              });
-                            },
-                          )
-                        : TextFormField(
+                    child:
+                    // !manualAmount
+                    //     ? SfSlider(
+                    //         min: 0.0,
+                    //         max: 100000.0,
+                    //         value: sliderAmount,
+                    //         interval: 20,
+                    //         showTicks: false,
+                    //         showLabels: false,
+                    //         enableTooltip: true,
+                    //         shouldAlwaysShowTooltip: true,
+                    //         tooltipShape: const SfPaddleTooltipShape(),
+                    //         thumbIcon: const Icon(Icons.add),
+                    //         minorTicksPerInterval: 1,
+                    //         onChanged: (value) {
+                    //           setState(() {
+                    //             sliderAmount = (value as double).floor();
+                    //             manualController.text = sliderAmount.toString();
+                    //           });
+                    //         },
+                    //       )
+                    //     :
+                    TextFormField(
                             controller: manualController,
                             decoration: const InputDecoration(
                               contentPadding:
                                   EdgeInsets.symmetric(horizontal: 10),
+                              prefixIcon: Icon(Icons.currency_rupee_rounded)
                             ),
                             onChanged: (val) {
                               sliderAmount =
@@ -567,16 +570,16 @@ class _RequestBottomSheetState extends State<RequestBottomSheet> {
                             },
                           ),
                   ),
-                  IconButton(
-                    onPressed: () {
-                      setState(() {
-                        manualAmount = !manualAmount;
-                      });
-                    },
-                    icon: Icon(manualAmount
-                        ? Icons.slideshow_rounded
-                        : Icons.text_fields_rounded),
-                  ),
+                  // IconButton(
+                  //   onPressed: () {
+                  //     setState(() {
+                  //       manualAmount = !manualAmount;
+                  //     });
+                  //   },
+                  //   icon: Icon(manualAmount
+                  //       ? Icons.slideshow_rounded
+                  //       : Icons.text_fields_rounded),
+                  // ),
                 ],
               ),
               const SizedBox(height: 20),
