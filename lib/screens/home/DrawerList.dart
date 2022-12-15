@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:revision/providers/ThemeProvider.dart';
+import 'package:revision/providers/UserProvider.dart';
+import 'package:revision/screens/pages/MyIncome/ReferralIncomePage.dart';
 import 'package:revision/screens/pages/MyIncome/directIncome.dart';
-import 'package:revision/screens/pages/giftPacks/GiftPage.dart';
+import 'package:revision/screens/pages/MyIncome/GiftPage.dart';
 import 'package:revision/screens/pages/myPaidPayments.dart';
 
 import '../../constants/widgets.dart';
+import '../pages/emiPage.dart';
 import '../pages/myTeam.dart';
 import '../pages/paymentHistory/paymentRequests.dart';
 import '../pages/paymentHistory/recievedPayment.dart';
@@ -20,10 +24,12 @@ class DrawerList extends StatefulWidget {
 }
 
 class _DrawerListState extends State<DrawerList> {
+  bool myIncomeExpanded = true;
+  bool payHisExpanded = true;
   @override
   Widget build(BuildContext context) {
-    return Consumer<ThemeProvider>(builder: (context, tp, _) {
-      var brt = tp.brightness;
+    return Consumer<UserProvider>(builder: (context, up, _) {
+      // var brt = tp.brightness;
       return Scaffold(
         body: SingleChildScrollView(
           child: Column(
@@ -52,6 +58,36 @@ class _DrawerListState extends State<DrawerList> {
                   ),
                 ),
               ),
+              if(up.associate.data!.emiTerm=='Emi')
+              Column(
+                children: [
+                  const SizedBox(height: 10),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    child: ListTile(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                      onTap: () {
+                        Get.to(const MyPaidPaymentsPage());
+                      },
+                      tileColor: Theme.of(context).colorScheme.primary,
+                      hoverColor: Colors.red,
+                      selectedColor: Colors.red,
+                      title: Text(
+                        'Paid Payments',
+                        style: Theme.of(context)
+                            .textTheme
+                            .headline6!
+                            .copyWith(color: Colors.white),
+                      ),
+                      leading: const Icon(
+                        Icons.payment,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
               const SizedBox(height: 10),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10.0),
@@ -59,20 +95,20 @@ class _DrawerListState extends State<DrawerList> {
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10)),
                   onTap: () {
-                    Get.to(const MyPaidPaymentsWidget());
+                    Get.to(const EmiPage());
                   },
                   tileColor: Theme.of(context).colorScheme.primary,
                   hoverColor: Colors.red,
                   selectedColor: Colors.red,
                   title: Text(
-                    'Paid Payments',
+                    'Emi Plans',
                     style: Theme.of(context)
                         .textTheme
                         .headline6!
                         .copyWith(color: Colors.white),
                   ),
                   leading: const Icon(
-                    Icons.payment,
+                    FontAwesomeIcons.addressBook,
                     color: Colors.white,
                   ),
                 ),
@@ -88,16 +124,23 @@ class _DrawerListState extends State<DrawerList> {
                     collapsedBackgroundColor:
                         Theme.of(context).colorScheme.primary,
                     collapsedIconColor: Colors.white,
+                    iconColor: Colors.blue,
+                    initiallyExpanded: true,
+                    onExpansionChanged: (val) {
+                      setState(() {
+                        myIncomeExpanded = !myIncomeExpanded;
+                      });
+                    },
                     title: Text(
                       'My Income',
-                      style: Theme.of(context)
-                          .textTheme
-                          .headline6!
-                          .copyWith(color: Colors.white),
+                      style: Theme.of(context).textTheme.headline6!.copyWith(
+                            color:
+                                myIncomeExpanded ? Colors.blue : Colors.white,
+                          ),
                     ),
                     leading: const Icon(
                       Icons.monetization_on,
-                      color: Colors.white,
+                      // color: Colors.white,
                     ),
                     children: [
                       ListTile(
@@ -120,7 +163,9 @@ class _DrawerListState extends State<DrawerList> {
                         ),
                       ),
                       ListTile(
-                        onTap: () {},
+                        onTap: () {
+                          Get.to(const ReferralIncomePage());
+                        },
                         hoverColor: Colors.red,
                         selectedColor: Colors.red,
                         title: Text(
@@ -166,16 +211,21 @@ class _DrawerListState extends State<DrawerList> {
                     collapsedBackgroundColor:
                         Theme.of(context).colorScheme.primary,
                     collapsedIconColor: Colors.white,
+                    iconColor: Colors.blue,
+                    initiallyExpanded: true,
+                    onExpansionChanged: (val) {
+                      setState(() {
+                        payHisExpanded = !payHisExpanded;
+                      });
+                    },
                     leading: const Icon(
                       Icons.monetization_on,
-                      color: Colors.white,
+                      // color: Colors.white,
                     ),
                     title: Text(
                       'Payments History',
-                      style: Theme.of(context)
-                          .textTheme
-                          .headline6!
-                          .copyWith(color: Colors.white),
+                      style: Theme.of(context).textTheme.headline6!.copyWith(
+                          color: payHisExpanded ? Colors.blue : Colors.white),
                     ),
                     children: [
                       ListTile(
@@ -231,6 +281,7 @@ class _DrawerListState extends State<DrawerList> {
                   ),
                 ),
               ),
+
             ],
           ),
         ),

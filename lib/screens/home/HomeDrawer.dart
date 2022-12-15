@@ -121,101 +121,101 @@ class _HomeDrawerState extends State<HomeDrawer> {
                     ))
               ],
             ),
-            SizedBox(
-              height: widget.height * 0.13,
-              // decoration: BoxDecoration(
-              //   // color: Theme.of(context).cardColor,
-              //   color: Colors.transparent,
-              // ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Get.to(const NotificationsPage());
-                      },
-                      child: Container(
-                        height: widget.height * 0.13,
-                        width: widget.height * 0.13,
-                        color: Colors.transparent,
-                        margin: const EdgeInsets.symmetric(horizontal: 3),
-                        child: Column(
-                          children: [
-                            SizedBox(height: widget.height * 0.02),
-                            Expanded(
-                                child: Image.asset('assets/drawer/notice.png')),
-                            SizedBox(height: widget.height * 0.02),
-                            Row(
-                              children: [
-                                Expanded(
-                                    child: b1Text('Notice',
-                                        textAlign: TextAlign.center,
-                                        maxLine: 1)),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {},
-                      child: Container(
-                        height: widget.height * 0.13,
-                        width: widget.height * 0.13,
-                        // color: Colors.white,
-                        margin: const EdgeInsets.symmetric(horizontal: 3),
-
-                        child: Column(
-                          children: [
-                            SizedBox(height: widget.height * 0.02),
-                            Expanded(
-                                child: Image.asset('assets/drawer/notice.png')),
-                            SizedBox(height: widget.height * 0.02),
-                            Row(
-                              children: [
-                                Expanded(
-                                    child: b1Text('Activities',
-                                        textAlign: TextAlign.center,
-                                        maxLine: 1)),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {},
-                      child: Container(
-                        height: widget.height * 0.13,
-                        width: widget.height * 0.13,
-                        // color: Colors.white,
-                        margin: const EdgeInsets.symmetric(horizontal: 3),
-
-                        child: Column(
-                          children: [
-                            SizedBox(height: widget.height * 0.02),
-                            Expanded(
-                                child: Image.asset('assets/drawer/notice.png')),
-                            SizedBox(height: widget.height * 0.02),
-                            Row(
-                              children: [
-                                Expanded(
-                                    child: b1Text('Notice',
-                                        textAlign: TextAlign.center,
-                                        maxLine: 1)),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            // SizedBox(
+            //   height: widget.height * 0.13,
+            //   // decoration: BoxDecoration(
+            //   //   // color: Theme.of(context).cardColor,
+            //   //   color: Colors.transparent,
+            //   // ),
+            //   child: Padding(
+            //     padding: const EdgeInsets.symmetric(vertical: 8.0),
+            //     child: ListView(
+            //       scrollDirection: Axis.horizontal,
+            //       padding: const EdgeInsets.symmetric(horizontal: 10),
+            //       children: [
+            //         GestureDetector(
+            //           onTap: () {
+            //             Get.to(const NotificationsPage());
+            //           },
+            //           child: Container(
+            //             height: widget.height * 0.13,
+            //             width: widget.height * 0.13,
+            //             color: Colors.transparent,
+            //             margin: const EdgeInsets.symmetric(horizontal: 3),
+            //             child: Column(
+            //               children: [
+            //                 SizedBox(height: widget.height * 0.02),
+            //                 Expanded(
+            //                     child: Image.asset('assets/drawer/notice.png')),
+            //                 SizedBox(height: widget.height * 0.02),
+            //                 Row(
+            //                   children: [
+            //                     Expanded(
+            //                         child: b1Text('Notice',
+            //                             textAlign: TextAlign.center,
+            //                             maxLine: 1)),
+            //                   ],
+            //                 ),
+            //               ],
+            //             ),
+            //           ),
+            //         ),
+            //         GestureDetector(
+            //           onTap: () {},
+            //           child: Container(
+            //             height: widget.height * 0.13,
+            //             width: widget.height * 0.13,
+            //             // color: Colors.white,
+            //             margin: const EdgeInsets.symmetric(horizontal: 3),
+            //
+            //             child: Column(
+            //               children: [
+            //                 SizedBox(height: widget.height * 0.02),
+            //                 Expanded(
+            //                     child: Image.asset('assets/drawer/notice.png')),
+            //                 SizedBox(height: widget.height * 0.02),
+            //                 Row(
+            //                   children: [
+            //                     Expanded(
+            //                         child: b1Text('Activities',
+            //                             textAlign: TextAlign.center,
+            //                             maxLine: 1)),
+            //                   ],
+            //                 ),
+            //               ],
+            //             ),
+            //           ),
+            //         ),
+            //         GestureDetector(
+            //           onTap: () {},
+            //           child: Container(
+            //             height: widget.height * 0.13,
+            //             width: widget.height * 0.13,
+            //             // color: Colors.white,
+            //             margin: const EdgeInsets.symmetric(horizontal: 3),
+            //
+            //             child: Column(
+            //               children: [
+            //                 SizedBox(height: widget.height * 0.02),
+            //                 Expanded(
+            //                     child: Image.asset('assets/drawer/notice.png')),
+            //                 SizedBox(height: widget.height * 0.02),
+            //                 Row(
+            //                   children: [
+            //                     Expanded(
+            //                         child: b1Text('Notice',
+            //                             textAlign: TextAlign.center,
+            //                             maxLine: 1)),
+            //                   ],
+            //                 ),
+            //               ],
+            //             ),
+            //           ),
+            //         ),
+            //       ],
+            //     ),
+            //   ),
+            // ),
             const SizedBox(height: 10),
             // GestureDetector(
             //   onTap: () {},

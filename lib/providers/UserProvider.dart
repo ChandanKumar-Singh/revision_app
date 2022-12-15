@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:api_cache_manager/models/cache_db_model.dart';
+import 'package:api_cache_manager/utils/cache_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
@@ -19,6 +21,9 @@ class UserProvider extends ChangeNotifier {
   bool uploadingImage = false;
   List recommendedBio = [];
   TextEditingController lastNameController = TextEditingController();
+  double totalDirect = 0.0;
+  double totalReferral = 0.0;
+  double totalWallet = 0.0;
 
   initRecommendedBio() async {
     if (associate.data != null) {
@@ -118,5 +123,55 @@ class UserProvider extends ChangeNotifier {
       print('e e e e e e e   e  ee e  e ---> $e');
     }
     hoverLoadingDialog(false);
+  }
+
+  Future<void> getDashboard() async {
+    var response;
+
+    try {
+      bool cacheExist = await APICacheManager().isAPICacheKeyExist('dashboard');
+      if (isOnline) {
+        var url = '${App.baseUrl}${App.dashboard}';
+        var headers = {
+          'Accept': '*/*',
+          'Authorization': 'Bearer ${prefs.getString('token')!}'
+        };
+        var res = await http.get(Uri.parse(url), headers: headers);
+        debugPrint('dash board data ${res.body}');
+
+        if (res.statusCode == 200) {
+          if (jsonDecode(res.body)['success'] == 200) {
+            var data = jsonDecode(res.body)['data'];
+            var cacheModel =
+                APICacheDBModel(key: 'dashboard', syncData: jsonEncode(data));
+            await APICacheManager().addCacheData(cacheModel);
+            response = cacheModel.syncData;
+          } else {
+            Fluttertoast.showToast(msg: jsonDecode(res.body)['message']);
+          }
+        }
+        print("it's url Hit ");
+      } else {
+        showNetWorkToast();
+        if (cacheExist) {
+          response =
+              (await APICacheManager().getCacheData('dashboard')).syncData;
+          print("it's cache Hit $response");
+        }
+      }
+      response = jsonDecode(response);
+      if (response != null) {
+        print('response type is ${response.runtimeType}');
+
+        totalDirect = double.parse(response['direct_income'].toString());
+        totalReferral =
+            double.parse(response['referral_income'].toString());
+        totalWallet = double.parse(response['walletBalance'].toString());
+        notifyListeners();
+      }
+    } catch (e) {
+
+      debugPrint('e e e e e dash board data  e e -> $e');
+    }
   }
 }

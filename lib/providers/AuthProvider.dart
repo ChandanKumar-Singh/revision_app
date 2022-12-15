@@ -207,7 +207,10 @@ class AuthProvider extends ChangeNotifier {
 
     try {
       bool cacheExist = await APICacheManager().isAPICacheKeyExist('login');
-      hoverLoadingDialog(true);
+      debugPrint(' i am loging = $imLogging');
+      if (imLogging != null) {
+        hoverLoadingDialog(true);
+      }
 
       if (isOnline) {
         var url = App.baseUrl + App.login;
@@ -257,7 +260,7 @@ class AuthProvider extends ChangeNotifier {
 
       if (response != null) {
         messaging.onTokenRefresh.listen((fcmToken) async {
-          deviceToken=fcmToken;
+          deviceToken = fcmToken;
           await saveTokenToDB(
               deviceToken, response['results']['data']['username']);
         }).onError((err) {
@@ -278,7 +281,9 @@ class AuthProvider extends ChangeNotifier {
       response = null;
     }
     // print('testing login ------ > $imLogging    $response');
-    hoverLoadingDialog(false);
+    if (imLogging != null) {
+      hoverLoadingDialog(false);
+    }
     return response;
   }
 

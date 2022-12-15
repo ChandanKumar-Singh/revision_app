@@ -9,11 +9,20 @@ class App{
   static const String getTeamMembers='getTeamMembers';
   static const String paymentHistory='paymentHistory';
 
+  static const String dashboard='dashboard';
+
   ///payment history
   static const String withdrawalPayments='withdrawalPayments';
   static const String recievedPayments='recievedPayments';
   static const String requestedPayments='requestedPayments';
   static const String addPaymentRequest='addPaymentRequest';
+
+   ///My income
+  static const String giftPacks='giftPacks';
+  static const String referralIncome='referralIncome';
+  static const String getAllReferralTeamMembers='getAllReferralTeamMembers';
+  static const String directIncome='directIncome';
+  // static const String addPaymentRequest='addPaymentRequest';
 
   ///credentials
   static const String updatePassword='updatePassword';

@@ -48,17 +48,17 @@ class _ReceivedPaymentsPageState extends State<ReceivedPaymentsPage> {
           key: scaffoldKey,
           backgroundColor: Theme.of(context).cardColor.withOpacity(0.9),
           body: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Theme.of(context).colorScheme.primary.withOpacity(0.7),
-                  Theme.of(context).colorScheme.onBackground.withOpacity(1),
-                ],
-                stops: const [0, 1],
-                begin: const AlignmentDirectional(0, -1),
-                end: const AlignmentDirectional(0, 1),
-              ),
-            ),
+            decoration: const BoxDecoration(
+                // gradient: LinearGradient(
+                //   colors: [
+                //     Theme.of(context).colorScheme.primary.withOpacity(0.7),
+                //     Theme.of(context).colorScheme.onBackground.withOpacity(1),
+                //   ],
+                //   stops: const [0, 1],
+                //   begin: const AlignmentDirectional(0, -1),
+                //   end: const AlignmentDirectional(0, 1),
+                // ),
+                ),
             child: NestedScrollView(
               headerSliverBuilder: (context, _) => [
                 SliverAppBar(
@@ -79,7 +79,7 @@ class _ReceivedPaymentsPageState extends State<ReceivedPaymentsPage> {
                             showModalBottomSheet(
                                 context: context,
                                 builder: (context) {
-                                  return const DateFilterSheet(
+                                  return const PHDateFilterSheet(
                                     type: HistoryType.received,
                                   );
                                 });
@@ -112,7 +112,7 @@ class _ReceivedPaymentsPageState extends State<ReceivedPaymentsPage> {
                     ),
                     centerTitle: true,
                     expandedTitleScale: 1.2,
-                    title: Text('Received Payments'),
+                    title: const Text('Received Payments'),
                     // titlePadding:
                     //     const EdgeInsetsDirectional.fromSTEB(50, 10, 10, 10),
                     // title: SizedBox(
@@ -380,15 +380,12 @@ class _ReceivedPaymentsPageState extends State<ReceivedPaymentsPage> {
                                         Padding(
                                           padding: const EdgeInsetsDirectional
                                               .fromSTEB(0, 20, 0, 0),
-                                          child: Container(
-                                            width: double.infinity,
-                                            // height: 70,
-                                            decoration: BoxDecoration(
-                                              color:
-                                                  Theme.of(context).cardColor,
-                                              border: Border.all(),
+                                          child: Card(
+                                            elevation: 10,
+                                            margin: const EdgeInsets.all(0),
+                                            shape: const RoundedRectangleBorder(
                                               borderRadius:
-                                                  const BorderRadius.only(
+                                                  BorderRadius.only(
                                                 bottomLeft: Radius.circular(10),
                                                 bottomRight:
                                                     Radius.circular(10),
@@ -396,145 +393,168 @@ class _ReceivedPaymentsPageState extends State<ReceivedPaymentsPage> {
                                                 topRight: Radius.circular(10),
                                               ),
                                             ),
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsetsDirectional
-                                                      .fromSTEB(10, 10, 10, 10),
-                                              child: Row(
-                                                mainAxisSize: MainAxisSize.max,
-                                                children: [
-                                                  Expanded(
-                                                    child: Column(
-                                                      mainAxisSize:
-                                                          MainAxisSize.max,
-                                                      children: [
-                                                        const SizedBox(
-                                                            height: 10),
-                                                        Row(
-                                                          mainAxisSize:
-                                                              MainAxisSize.max,
-                                                          children: [
-                                                            Expanded(
-                                                              child: Text(
-                                                                'Received  Rs. ${received.recivedAmount}',
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .start,
-                                                                style: Theme.of(
-                                                                        context)
-                                                                    .textTheme
-                                                                    .headline6,
-                                                              ),
-                                                            ),
-                                                            Container(
-                                                              padding: const EdgeInsets
-                                                                      .symmetric(
-                                                                  horizontal:
-                                                                      15,
-                                                                  vertical: 5),
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                color: Colors
-                                                                    .greenAccent
-                                                                    .withOpacity(
-                                                                        0.2),
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            40),
-                                                                border:
-                                                                    Border.all(
-                                                                  color: Colors
-                                                                      .green,
-                                                                ),
-                                                              ),
-                                                              child: Row(
-                                                                mainAxisSize:
-                                                                    MainAxisSize
-                                                                        .max,
-                                                                mainAxisAlignment:
-                                                                    MainAxisAlignment
-                                                                        .center,
-                                                                children: [
-                                                                  Text(
-                                                                    'Received',
-                                                                    style: Theme.of(
-                                                                            context)
-                                                                        .textTheme
-                                                                        .bodyText1!
-                                                                        .copyWith(
-                                                                          fontFamily:
-                                                                              'Lato',
-                                                                          color:
-                                                                              Colors.green,
-                                                                        ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        // Row(
-                                                        //   mainAxisSize:
-                                                        //       MainAxisSize.max,
-                                                        //   children: [
-                                                        //     Expanded(
-                                                        //       child: Padding(
-                                                        //         padding:
-                                                        //             const EdgeInsetsDirectional
-                                                        //                     .fromSTEB(
-                                                        //                 0,
-                                                        //                 5,
-                                                        //                 0,
-                                                        //                 0),
-                                                        //         child: Text(
-                                                        //           'description : Send me my next Payment',
-                                                        //           style: Theme.of(
-                                                        //                   context)
-                                                        //               .textTheme
-                                                        //               .headline6,
-                                                        //         ),
-                                                        //       ),
-                                                        //     ),
-                                                        //   ],
-                                                        // ),
-                                                        Row(
-                                                          mainAxisSize:
-                                                              MainAxisSize.max,
-                                                          children: [
-                                                            const Icon(
-                                                              Icons
-                                                                  .mark_chat_unread_outlined,
-                                                              size: 15,
-                                                            ),
-                                                            const SizedBox(
-                                                                width: 10),
-                                                            Expanded(
-                                                              child: Padding(
-                                                                padding:
-                                                                    const EdgeInsetsDirectional
-                                                                            .fromSTEB(
-                                                                        0,
-                                                                        5,
-                                                                        0,
-                                                                        0),
+                                            child: Container(
+                                              width: double.infinity,
+                                              // height: 70,
+                                              decoration: BoxDecoration(
+                                                color:
+                                                    Theme.of(context).cardColor,
+                                                border: Border.all(),
+                                                borderRadius:
+                                                    const BorderRadius.only(
+                                                  bottomLeft:
+                                                      Radius.circular(10),
+                                                  bottomRight:
+                                                      Radius.circular(10),
+                                                  topLeft: Radius.circular(10),
+                                                  topRight: Radius.circular(10),
+                                                ),
+                                              ),
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsetsDirectional
+                                                            .fromSTEB(
+                                                        10, 10, 10, 10),
+                                                child: Row(
+                                                  mainAxisSize:
+                                                      MainAxisSize.max,
+                                                  children: [
+                                                    Expanded(
+                                                      child: Column(
+                                                        mainAxisSize:
+                                                            MainAxisSize.max,
+                                                        children: [
+                                                          const SizedBox(
+                                                              height: 10),
+                                                          Row(
+                                                            mainAxisSize:
+                                                                MainAxisSize
+                                                                    .max,
+                                                            children: [
+                                                              Expanded(
                                                                 child: Text(
-                                                                  (received.adminComments ??
-                                                                          '')
-                                                                      .capitalize!,
+                                                                  'Received ${NumberFormat.simpleCurrency(name: 'INR').format(double.parse(received.recivedAmount??'0'))}',
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .start,
                                                                   style: Theme.of(
                                                                           context)
                                                                       .textTheme
                                                                       .headline6,
                                                                 ),
                                                               ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ],
+                                                              Container(
+                                                                padding: const EdgeInsets
+                                                                        .symmetric(
+                                                                    horizontal:
+                                                                        15,
+                                                                    vertical:
+                                                                        5),
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  color: Colors
+                                                                      .greenAccent
+                                                                      .withOpacity(
+                                                                          0.2),
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              40),
+                                                                  border: Border
+                                                                      .all(
+                                                                    color: Colors
+                                                                        .green,
+                                                                  ),
+                                                                ),
+                                                                child: Row(
+                                                                  mainAxisSize:
+                                                                      MainAxisSize
+                                                                          .max,
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .center,
+                                                                  children: [
+                                                                    Text(
+                                                                      'Received',
+                                                                      style: Theme.of(
+                                                                              context)
+                                                                          .textTheme
+                                                                          .bodyText1!
+                                                                          .copyWith(
+                                                                            fontFamily:
+                                                                                'Lato',
+                                                                            color:
+                                                                                Colors.green,
+                                                                          ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          // Row(
+                                                          //   mainAxisSize:
+                                                          //       MainAxisSize.max,
+                                                          //   children: [
+                                                          //     Expanded(
+                                                          //       child: Padding(
+                                                          //         padding:
+                                                          //             const EdgeInsetsDirectional
+                                                          //                     .fromSTEB(
+                                                          //                 0,
+                                                          //                 5,
+                                                          //                 0,
+                                                          //                 0),
+                                                          //         child: Text(
+                                                          //           'description : Send me my next Payment',
+                                                          //           style: Theme.of(
+                                                          //                   context)
+                                                          //               .textTheme
+                                                          //               .headline6,
+                                                          //         ),
+                                                          //       ),
+                                                          //     ),
+                                                          //   ],
+                                                          // ),
+                                                          Row(
+                                                            mainAxisSize:
+                                                                MainAxisSize
+                                                                    .max,
+                                                            children: [
+                                                              const Icon(
+                                                                Icons
+                                                                    .mark_chat_unread_outlined,
+                                                                size: 15,
+                                                              ),
+                                                              const SizedBox(
+                                                                  width: 10),
+                                                              Expanded(
+                                                                child: Padding(
+                                                                  padding:
+                                                                      const EdgeInsetsDirectional
+                                                                              .fromSTEB(
+                                                                          0,
+                                                                          5,
+                                                                          0,
+                                                                          0),
+                                                                  child: Text(
+                                                                    (received.adminComments ??
+                                                                            '')
+                                                                        .capitalize!,
+                                                                    style: Theme.of(
+                                                                            context)
+                                                                        .textTheme
+                                                                        .headline6,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ],
+                                                      ),
                                                     ),
-                                                  ),
-                                                ],
+                                                  ],
+                                                ),
                                               ),
                                             ),
                                           ),
@@ -620,15 +640,15 @@ class _ReceivedPaymentsPageState extends State<ReceivedPaymentsPage> {
   }
 }
 
-class DateFilterSheet extends StatefulWidget {
-  const DateFilterSheet({Key? key, required this.type}) : super(key: key);
+class PHDateFilterSheet extends StatefulWidget {
+  const PHDateFilterSheet({Key? key, required this.type}) : super(key: key);
   final HistoryType type;
 
   @override
-  State<DateFilterSheet> createState() => _DateFilterSheetState();
+  State<PHDateFilterSheet> createState() => _PHDateFilterSheetState();
 }
 
-class _DateFilterSheetState extends State<DateFilterSheet> {
+class _PHDateFilterSheetState extends State<PHDateFilterSheet> {
   @override
   Widget build(BuildContext context) {
     return Consumer<PaymentsHistoryProvider>(builder: (context, php, _) {

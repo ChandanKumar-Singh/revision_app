@@ -2,11 +2,14 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:provider/provider.dart';
 import 'package:revision/constants/app.dart';
 import 'package:revision/constants/widgets.dart';
+import 'package:revision/providers/AuthProvider.dart';
 import 'package:revision/providers/ThemeProvider.dart';
 import 'package:revision/providers/UserProvider.dart';
 import 'dart:ui';
@@ -14,8 +17,17 @@ import 'package:flutter/services.dart';
 import 'dart:math';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import '../../functions.dart';
+import '../../providers/myIncomeProvider.dart';
+import '../../providers/paidPaymentsProvider.dart';
+import '../../widgets/cupPage.dart';
+import '../../widgets/customToolTip.dart';
+import '../../widgets/iconRefreshPage.dart';
+import '../../widgets/imageRefreshPage.dart';
 import 'HomeDrawer.dart';
+import 'package:skeleton_loader/skeleton_loader.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -91,6 +103,10 @@ class MyCustomUIState extends State<MyCustomUI>
         .animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
 
     _controller.forward();
+    Provider.of<MyIncomeProvider>(context, listen: false).getReferralMembers();
+    Provider.of<PaidPaymentsProvider>(context, listen: false)
+        .getPaimentHistory(false);
+    Provider.of<MyIncomeProvider>(context, listen: false).getGifts(false);
   }
 
   @override
@@ -104,575 +120,252 @@ class MyCustomUIState extends State<MyCustomUI>
   bool checkingIncome = false;
   bool checkingWallet = false;
   bool showPrices = true;
-  double _height = 0;
+  List<GiftCard> gifts = [
+    GiftCard(giftName: 'Smart Phone', amount: 479000),
+    GiftCard(giftName: 'Bike', amount: 559000),
+    GiftCard(giftName: 'Laptop', amount: 700000),
+    GiftCard(giftName: 'Bike', amount: 330000),
+  ];
+  bool refreshingHome = false;
+  final GlobalKey<LiquidPullToRefreshState> _refreshIndicatorKey =
+      GlobalKey<LiquidPullToRefreshState>();
+
+  Future<void> _handleRefresh() async {
+    setState(() {
+      refreshingHome = true;
+    });
+    try {
+      await refreshThese()
+          .then((value) => print('Refresh Successful! 😊'))
+          .then((value) {
+        // ScaffoldMessenger.of(_scaffoldKey.currentState!.context)
+        //     .showSnackBar(
+        //   SnackBar(
+        //     content: const Text('Refresh complete'),
+        //     action: SnackBarAction(
+        //       label: 'Refresh again',
+        //       onPressed: () {
+        //         _refreshIndicatorKey.currentState!.show();
+        //       },
+        //     ),
+        //   ),
+        // );
+      });
+    } catch (e) {
+      // ScaffoldMessenger.of(_scaffoldKey.currentState!.context).showSnackBar(
+      //   SnackBar(
+      //     content: const Text('Refresh failed'),
+      //     action: SnackBarAction(
+      //       label: 'Refresh again',
+      //       onPressed: () {
+      //         _refreshIndicatorKey.currentState!.show();
+      //       },
+      //     ),
+      //   ),
+      // );
+      Fluttertoast.showToast(msg: 'Refresh failed! 👎');
+
+      print('refreshing error ---> $e');
+    }
+    Timer(const Duration(seconds: 1), () {
+      setState(() {
+        refreshingHome = false;
+      });
+    });
+  }
+
+  Future<void> refreshThese() async {
+    if (isOnline) {
+      Provider.of<AuthProvider>(context, listen: false).username.text =
+          prefs.getString('username')!;
+      Provider.of<AuthProvider>(context, listen: false).passController.text =
+          prefs.getString('password')!;
+      await Provider.of<MyIncomeProvider>(context, listen: false)
+          .getReferralMembers();
+      await Provider.of<UserProvider>(context, listen: false).getDashboard();
+      await Provider.of<PaidPaymentsProvider>(context, listen: false)
+          .getPaimentHistory(false);
+      await Provider.of<MyIncomeProvider>(context, listen: false).getGifts(
+          false); // await Provider.of<AuthProvider>(context, listen: false)
+//     .login(imLogging: false);
+      Fluttertoast.showToast(msg: 'Refresh Successful! 😊');
+    } else {
+      showNetWorkToast();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     double w = MediaQuery.of(context).size.width;
-    double height = Get.height;
+    double h = Get.height;
 
     return Consumer<UserProvider>(builder: (context, up, _) {
       return Scaffold(
         key: _scaffoldKey,
-        // backgroundColor: Colors.grey.withOpacity(scUp ? 0.7 : 0.7),
-        extendBodyBehindAppBar: true,
-        appBar: PreferredSize(
-          preferredSize: const Size(double.infinity, kToolbarHeight),
-          child: Card(
-            margin: const EdgeInsets.all(0),
-            shadowColor: scUp ? Colors.grey : Colors.transparent,
-            elevation: 15,
-            shape: RoundedRectangleBorder(
-              borderRadius:
-                  BorderRadius.only(bottomLeft: Radius.circular(scUp ? 20 : 0)),
-            ),
-            color: scUp
-                ? Theme.of(context).scaffoldBackgroundColor.withOpacity(01)
-                : Theme.of(context).colorScheme.primary.withOpacity(0.0),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 0, sigmaY: 0),
-              child: SafeArea(
-                child: Row(
-                  children: [
-                    IconButton(
-                      tooltip: 'Menu',
-                      splashColor: Colors.transparent,
-                      highlightColor: Colors.transparent,
-                      icon: const Icon(
-                        Icons.menu,
-                      ),
-                      onPressed: () {
-                        HapticFeedback.lightImpact();
-                        _scaffoldKey.currentState?.openDrawer();
-                      },
-                    ),
-                    Expanded(
-                      child: Builder(builder: (context) {
-                        var fname = App.appname.split(' ').first;
-                        var lnames = App.appname.split(' ');
-                        lnames.removeAt(0);
-                        var lname = lnames.join(' ');
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            h5Text(
-                              fname,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            capText(
-                              lname,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ],
-                        );
-                      }),
-                    ),
-                    Row(
-                      children: [
-                        h6Text(
-                          '15 May 2022',
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(width: 10),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
         drawer: HomeDrawer(
             scaffoldKey: _scaffoldKey,
-            height: height,
+            height: h,
             up: up,
             onChangeTheme: () {
               Timer(const Duration(milliseconds: 500), () {
                 setState(() {});
               });
             }),
-        // backgroundColor: const Color(0xff2A40CE),
+        bottomNavigationBar: Container(
+          height: 60,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Divider(
+                height: 0,
+                thickness: 1,
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 18.0),
+                child: Row(
+                  children: [
+                    Expanded(child: b1Text('Update is available')),
+                    ElevatedButton(
+                        onPressed: () async {
+                          if (await canLaunchUrl(Uri.parse(
+                              "https://play.google.com/store/apps/details?id=" +
+                                  appPackageName))) {
+                            print(Uri.parse(
+                              "https://play.google.com/store/apps/details?id=" +
+                                  appPackageName,
+                            ));
+                            await launchUrl(
+                              Uri.parse(
+                                "https://play.google.com/store/apps/details?id=" +
+                                    appPackageName,
+                              ),
+                              mode: LaunchMode.externalApplication,
+                            );
+                          } else {
+                            Fluttertoast.showToast(
+                                msg: 'Could not launch Google Play Store');
+                          }
+                        },
+                        child: const Text('Update')),
+                  ],
+                ),
+              ),
+              Container(),
+            ],
+          ),
+        ),
+        body: Scaffold(
+          // backgroundColor: Colors.grey.withOpacity(scUp ? 0.7 : 0.7),
+          extendBodyBehindAppBar: true,
+          appBar: homeAppBar(context),
 
-        body: Container(
-          // color: Colors.grey.withOpacity(scUp ? 0.7 : 0.7),
-          child: Padding(
+          // backgroundColor: const Color(0xff2A40CE),
+
+          body: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 0.0),
-            child: ListView(
-              controller: scrollController,
-              physics: const BouncingScrollPhysics(
-                  parent: AlwaysScrollableScrollPhysics()),
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                  child: Column(
-                    children: [
-                      SizedBox(height: w / 13),
-                      // Tooltip(
-                      //   // message: 'Call Me',
-                      //   richMessage:TextSpan(text: 'hhhhhhhhhhhh'),
-                      //   triggerMode: TooltipTriggerMode.tap,
-                      //   preferBelow: false,
-                      //
-                      //   child: ElevatedButton(
-                      //
-                      //     onPressed: () async {
-                      //       const number = '+919135324545';
-                      //       bool? res =
-                      //           await FlutterPhoneDirectCaller.callNumber(number)
-                      //               ;
-                      //       print('res    $res   99999');
-                      //     },
-                      //     child: Text('call'),
-                      //   ),
-                      // ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            child: LiquidPullToRefresh(
+              key: _refreshIndicatorKey, // key if you want to add
+              onRefresh: _handleRefresh,
+              color: Theme.of(context).colorScheme.primary,
+              backgroundColor: Colors.white,
+              height: kToolbarHeight + 70,
+              child: ListView(
+                controller: scrollController,
+                physics: const BouncingScrollPhysics(
+                    parent: AlwaysScrollableScrollPhysics()),
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 20),
+                        // Tooltip(
+                        //   // message: 'Call Me',
+                        //   richMessage:TextSpan(text: 'hhhhhhhhhhhh'),
+                        //   triggerMode: TooltipTriggerMode.tap,
+                        //   preferBelow: false,
+                        //
+                        //   child: ElevatedButton(
+                        //
+                        //     onPressed: () async {
+                        //       const number = '+919135324545';
+                        //       bool? res =
+                        //           await FlutterPhoneDirectCaller.callNumber(number)
+                        //               ;
+                        //       print('res    $res   99999');
+                        //     },
+                        //     child: Text('call'),
+                        //   ),
+                        // ),
+                        homeFirstRow(context),
+                        const SizedBox(height: 30),
+                        Row(
                           children: [
-                            SizedBox(
-                              width: Get.width / 6,
-                              child: GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    checkingSales = !checkingSales;
-                                    if (checkingSales) {
-                                      checkingIncome = false;
-                                      checkingWallet = false;
-                                    }
-                                    if (checkingSales ||
-                                        checkingIncome ||
-                                        checkingWallet) {
-                                      _height = 200;
-                                    }
-                                  });
-                                },
-                                child: Column(
-                                  children: [
-                                    Image.asset(
-                                      'assets/sales.png',
-                                      color: Theme.of(context).brightness ==
-                                              Brightness.dark
-                                          ? Colors.white
-                                          : Theme.of(context)
-                                              .colorScheme
-                                              .primary,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                              width: Get.width / 5,
-                              child: GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    checkingIncome = !checkingIncome;
-                                    if (checkingIncome) {
-                                      checkingSales = false;
-                                      checkingWallet = false;
-                                    }
-                                    if (checkingSales ||
-                                        checkingIncome ||
-                                        checkingWallet) {
-                                      _height = 200;
-                                    }
-                                  });
-                                },
-                                child: Column(
-                                  children: [
-                                    Image.asset(
-                                      'assets/income.png',
-                                      color: Theme.of(context).brightness ==
-                                              Brightness.dark
-                                          ? Colors.white
-                                          : Theme.of(context)
-                                              .colorScheme
-                                              .primary,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                              width: Get.width / 7,
-                              child: GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    checkingWallet = !checkingWallet;
-                                    if (checkingWallet) {
-                                      checkingIncome = false;
-                                      checkingSales = false;
-                                    }
-                                    if (checkingSales ||
-                                        checkingIncome ||
-                                        checkingWallet) {
-                                      _height = 200;
-                                    }
-                                  });
-                                },
-                                child: Column(
-                                  children: [
-                                    Image.asset(
-                                      'assets/wallet.png',
-                                      color: Theme.of(context).brightness ==
-                                              Brightness.dark
-                                          ? Colors.white
-                                          : Theme.of(context)
-                                              .colorScheme
-                                              .primary,
-                                    ),
-                                  ],
-                                ),
-                              ),
+                            h6Text(
+                              'Payments Details',
+                              fontWeight: FontWeight.bold,
                             ),
                           ],
                         ),
-                      ),
-                      // if (checkingSales || checkingIncome || checkingWallet)
-                      AnimatedContainer(
-                        width: double.infinity,
-                        height:
-                            checkingWallet || checkingIncome || checkingSales
-                                ? 75.0
-                                : 0.0,
-                        // color: checkingWallet || checkingIncome || checkingSales
-                        //     ? Colors.red
-                        //     : Colors.blue,
-                        onEnd: () {
-                          setState(() {
-                            showPrices = false;
-                          });
-                          debugPrint('showPrices --->$showPrices');
-                        },
-                        duration: const Duration(seconds: 2),
-                        curve: Curves.fastOutSlowIn,
-                        child: AspectRatio(
-                          aspectRatio: 16 / 9,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              if (showPrices)
-                                SizedBox(
-                                  width: Get.width / 4,
-                                  child: Column(
-                                    children: [
-                                      if (checkingSales && showPrices)
-                                        Column(
-                                          children: [
-                                            Row(
-                                              children: const [
-                                                Expanded(
-                                                  child: Text(
-                                                    '₹@00rrrrrrrrr 0000',
-                                                    maxLines: 4,
-                                                    textAlign: TextAlign.center,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                    ],
-                                  ),
-                                ),
-                              SizedBox(
-                                width: Get.width / 4,
-                                child: Column(
-                                  children: [
-                                    if (checkingIncome && showPrices)
-                                      Column(
-                                        children: [
-                                          Row(
-                                            children: const [
-                                              Expanded(
-                                                child: Text(
-                                                  '₹@00rrrrrrrrrrrrr 0000',
-                                                  maxLines: 3,
-                                                  textAlign: TextAlign.center,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                  ],
-                                ),
-                              ),
-                              SizedBox(
-                                width: Get.width / 4,
-                                child: Column(
-                                  children: [
-                                    if (checkingWallet && showPrices)
-                                      Column(
-                                        children: [
-                                          Row(
-                                            children: const [
-                                              Expanded(
-                                                child: Text(
-                                                  '₹@00rrrrrrrrrrrrr0000',
-                                                  maxLines: 3,
-                                                  textAlign: TextAlign.center,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
+                        const SizedBox(height: 20),
+                        homePaymentCircleCard(),
+                        const SizedBox(height: 30),
+                        Row(
+                          children: [
+                            h6Text(
+                              'Gift Cards',
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ],
                         ),
-                      ),
-                      // const SizedBox(height: 30),
-                      Row(
-                        children: [
-                          h6Text(
-                            'Payments Details',
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-                      Card(
-                        elevation: 15,
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(7),
-                            bottomRight: Radius.circular(7),
-                            topLeft: Radius.circular(7),
-                            topRight: Radius.circular(100),
-                          ),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: Column(
-                            children: [
-                              Row(
-                                children: [
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Container(
-                                            width: 5,
-                                            height: 50,
-                                            decoration: BoxDecoration(
-                                              color: Colors.green,
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                            ),
-                                          ),
-                                          const SizedBox(width: 10),
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              b1Text(
-                                                'Total',
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                              const SizedBox(height: 10),
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.start,
-                                                children: [
-                                                  const Icon(
-                                                    Icons
-                                                        .currency_rupee_rounded,
-                                                    size: 15,
-                                                  ),
-                                                  b1Text(
-                                                    '2000000',
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 10),
-                                      Row(
-                                        children: [
-                                          Container(
-                                            width: 5,
-                                            height: 50,
-                                            decoration: BoxDecoration(
-                                              color: Colors.amber,
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                            ),
-                                          ),
-                                          const SizedBox(width: 10),
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              b1Text(
-                                                'Paid',
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                              const SizedBox(height: 10),
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.start,
-                                                children: [
-                                                  const Icon(
-                                                    Icons
-                                                        .currency_rupee_rounded,
-                                                    size: 15,
-                                                  ),
-                                                  b1Text(
-                                                    '20000',
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                  const Spacer(),
-                                  SizedBox(
-                                    height: 100,
-                                    width: 100,
-                                    child: DashBoardCircleProgress(),
-                                  ),
-                                  const SizedBox(width: 10),
-                                ],
-                              ),
-                              const SizedBox(height: 10),
-                              Container(
-                                width: double.infinity,
-                                height: 5,
-                                decoration: BoxDecoration(
-                                  color: Colors.grey,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                              const SizedBox(height: 10),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Row(
-                                      children: [
-                                        Container(
-                                          width: 5,
-                                          height: 50,
-                                          decoration: BoxDecoration(
-                                            color: Colors.red,
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 10),
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            b1Text(
-                                              'Due',
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                            const SizedBox(height: 10),
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
-                                              children: [
-                                                const Icon(
-                                                  Icons.currency_rupee_rounded,
-                                                  size: 15,
-                                                ),
-                                                b1Text(
-                                                  '20000',
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: Row(
-                                      children: [
-                                        Container(
-                                          width: 5,
-                                          height: 50,
-                                          decoration: BoxDecoration(
-                                            color: Colors.blue,
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 10),
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            b1Text(
-                                              'Last Paid',
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                            const SizedBox(height: 10),
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
-                                              children: [
-                                                const Icon(
-                                                  Icons.calendar_month,
-                                                  size: 15,
-                                                ),
-                                                const SizedBox(width: 5),
-                                                b1Text(
-                                                  '30 Dec 2022',
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 30),
-                      Row(
-                        children: [
-                          h6Text(
-                            'Gift Cards',
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-                    ],
+                        const SizedBox(height: 20),
+                      ],
+                    ),
                   ),
-                ),
-                SizedBox(
+                  homeGiftCardsList(),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 30),
+                        Row(
+                          children: [
+                            h6Text(
+                              'Monthly Overview',
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        const SizedBox(
+                          height: 500,
+                          child: BarChartSample1(),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 100),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    });
+  }
+
+  Widget homeGiftCardsList() {
+    return Consumer<MyIncomeProvider>(builder: (context, mip, _) {
+      return SizedBox(
+        height: 210,
+        child: !mip.loadingGifts
+            ? SkeletonLoader(
+                builder: SizedBox(
                   height: 210,
                   child: ListView.builder(
                       padding: const EdgeInsets.symmetric(horizontal: 15),
                       scrollDirection: Axis.horizontal,
-                      itemCount: 10,
+                      itemCount: 11,
                       itemBuilder: (context, i) {
                         return SizedBox(
                           width: 150,
@@ -702,8 +395,7 @@ class MyCustomUIState extends State<MyCustomUI>
                                     child: Row(
                                       children: [
                                         Expanded(
-                                          child: Text(
-                                              'Smart Phone o r o e ru  t  ere epr effe ',
+                                          child: Text('                 ',
                                               maxLines: 3,
                                               style: TextStyle(
                                                 color: Colors.white,
@@ -716,6 +408,8 @@ class MyCustomUIState extends State<MyCustomUI>
                                     ),
                                   ),
                                   Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Row(
                                         children: [
@@ -729,15 +423,17 @@ class MyCustomUIState extends State<MyCustomUI>
                                           ),
                                         ],
                                       ),
+                                      const Icon(
+                                        Icons.currency_rupee_rounded,
+                                        color: Colors.white,
+                                      ),
                                       Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
                                         children: [
-                                          const Icon(
-                                            Icons.currency_rupee_rounded,
-                                            color: Colors.white,
-                                          ),
                                           Expanded(
                                             child: h6Text(
-                                              '300vgve 000',
+                                              '                       ',
                                               maxLine: 2,
                                               color: Colors.white,
                                               fontWeight: FontWeight.bold,
@@ -754,34 +450,811 @@ class MyCustomUIState extends State<MyCustomUI>
                         );
                       }),
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                  child: Column(
+                items: 1,
+                period: const Duration(seconds: 3),
+                highlightColor:
+                    Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                direction: SkeletonDirection.ltr,
+              )
+            : ListView.builder(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                scrollDirection: Axis.horizontal,
+                itemCount: mip.gifts.length,
+                itemBuilder: (context, i) {
+                  return SizedBox(
+                    width: 150,
+                    child: Card(
+                      elevation: 15,
+                      color:
+                          Theme.of(context).colorScheme.primary.withOpacity(1),
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(7),
+                          bottomRight: Radius.circular(7),
+                          topLeft: Radius.circular(7),
+                          topRight: Radius.circular(100),
+                        ),
+                      ),
+                      child: Container(
+                        width: 200,
+                        padding: const EdgeInsets.all(20.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(right: 8.0),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(mip.gifts[i].giftPack ?? '',
+                                        maxLines: 3,
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: Get.theme.textTheme
+                                              .headline6!.fontSize,
+                                          fontWeight: FontWeight.bold,
+                                        )),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: b1Text(
+                                        'On Business of',
+                                        maxLine: 3,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.normal,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const Icon(
+                                  Icons.currency_rupee_rounded,
+                                  color: Colors.white,
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      child: h6Text(
+                                        oCcy.format(double.parse(
+                                            mip.gifts[i].totalBusiness ?? '0')),
+                                        maxLine: 2,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+      );
+    });
+  }
+
+  Widget homePaymentCircleCard() {
+    return Consumer<PaidPaymentsProvider>(builder: (context, ppp, _) {
+      double total = double.parse(ppp.totalAmount.toString());
+      double paid = double.parse(ppp.totalPaid.toString());
+      double due = total - paid;
+      String lastPaid = ppp.payments.isNotEmpty
+          ? DateFormat('dd MMM yyyy')
+              .format(DateTime.parse(ppp.payments.first.date!))
+          : 'N/A';
+      print('ppp ${ppp.loadingMembers}');
+      // String lastPaid = 'foeyrey';
+      return Card(
+        elevation: 15,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(7),
+            bottomRight: Radius.circular(7),
+            topLeft: Radius.circular(7),
+            topRight: Radius.circular(100),
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: ppp.loadingMembers
+              ? SkeletonLoader(
+                  builder: Column(
                     children: [
-                      const SizedBox(height: 30),
                       Row(
                         children: [
-                          h6Text(
-                            'Daily Overview',
-                            fontWeight: FontWeight.bold,
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    width: 5,
+                                    height: 50,
+                                    decoration: BoxDecoration(
+                                      color: Colors.green,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      b1Text(
+                                        'Total',
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      const SizedBox(height: 10),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          const Icon(
+                                            Icons.currency_rupee_rounded,
+                                            size: 15,
+                                          ),
+                                          b1Text(
+                                            oCcy.format(total),
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 10),
+                              Row(
+                                children: [
+                                  Container(
+                                    width: 5,
+                                    height: 50,
+                                    decoration: BoxDecoration(
+                                      color: Colors.amber,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      b1Text(
+                                        'Paid',
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      const SizedBox(height: 10),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          const Icon(
+                                            Icons.currency_rupee_rounded,
+                                            size: 15,
+                                          ),
+                                          b1Text(
+                                            oCcy.format(paid),
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          const Spacer(),
+                          SizedBox(
+                            height: 100,
+                            width: 100,
+                            child: DashBoardCircleProgress(
+                                total: total, paid: paid),
+                          ),
+                          const SizedBox(width: 10),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Container(
+                        width: double.infinity,
+                        height: 5,
+                        decoration: BoxDecoration(
+                          color: Colors.grey,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 5,
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                    color: Colors.red,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    b1Text(
+                                      'Due',
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    const SizedBox(height: 10),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        const Icon(
+                                          Icons.currency_rupee_rounded,
+                                          size: 15,
+                                        ),
+                                        b1Text(
+                                          oCcy.format(due),
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          Expanded(
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 5,
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    b1Text(
+                                      'Last Paid',
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    const SizedBox(height: 10),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        const Icon(
+                                          Icons.calendar_month,
+                                          size: 15,
+                                        ),
+                                        const SizedBox(width: 5),
+                                        b1Text(
+                                          'dd-MM-yyyy',
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 20),
-                      const SizedBox(
-                        height: 500,
-                        child: BarChartSample1(),
+                    ],
+                  ),
+                  items: 1,
+                  period: const Duration(seconds: 1),
+                  highlightColor:
+                      Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                  direction: SkeletonDirection.ltr,
+                )
+              : Column(
+                  children: [
+                    Row(
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  width: 5,
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                    color: Colors.green,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    b1Text(
+                                      'Total',
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    const SizedBox(height: 10),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        const Icon(
+                                          Icons.currency_rupee_rounded,
+                                          size: 15,
+                                        ),
+                                        b1Text(
+                                          '$total',
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 10),
+                            Row(
+                              children: [
+                                Container(
+                                  width: 5,
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                    color: Colors.amber,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    b1Text(
+                                      'Paid',
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    const SizedBox(height: 10),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        const Icon(
+                                          Icons.currency_rupee_rounded,
+                                          size: 15,
+                                        ),
+                                        b1Text(
+                                          '$paid',
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        const Spacer(),
+                        SizedBox(
+                          height: 100,
+                          width: 100,
+                          child:
+                              DashBoardCircleProgress(total: total, paid: paid),
+                        ),
+                        const SizedBox(width: 10),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
+                      width: double.infinity,
+                      height: 5,
+                      decoration: BoxDecoration(
+                        color: Colors.grey,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 5,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  color: Colors.red,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  b1Text(
+                                    'Due',
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      const Icon(
+                                        Icons.currency_rupee_rounded,
+                                        size: 15,
+                                      ),
+                                      b1Text(
+                                        '$due',
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 5,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  color: Colors.blue,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  b1Text(
+                                    'Last Paid',
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      const Icon(
+                                        Icons.calendar_month,
+                                        size: 15,
+                                      ),
+                                      const SizedBox(width: 5),
+                                      b1Text(
+                                        lastPaid,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+        ),
+      );
+    });
+  }
+
+  Row homeFirstRow(BuildContext context) {
+    var up = Provider.of<UserProvider>(context, listen: false);
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        SizedBox(
+          width: Get.width / 3.3,
+          child: GestureDetector(
+            // onTap: () {
+            //   setState(() {
+            //     checkingIncome = !checkingIncome;
+            //     if (checkingIncome) {
+            //       checkingSales = false;
+            //       checkingWallet = false;
+            //     }
+            //     if (checkingSales || checkingIncome || checkingWallet) {
+            //       _height = 200;
+            //     }
+            //   });
+            // },
+            child: Tooltip(
+              message: 'Income',
+              triggerMode: TooltipTriggerMode.tap,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: Get.width / 6,
+                    child: Image.asset(
+                      'assets/income.png',
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white
+                          : Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.currency_rupee_rounded,
+                        size: 15,
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: b1Text(oCcy.format(up.totalDirect),
+                                textAlign: TextAlign.center,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ],
                       ),
                     ],
                   ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        SizedBox(
+          width: Get.width / 3.3,
+          child: GestureDetector(
+            // onTap: () {
+            //   setState(() {
+            //     checkingSales = !checkingSales;
+            //     if (checkingSales) {
+            //       checkingIncome = false;
+            //       checkingWallet = false;
+            //     }
+            //     if (checkingSales || checkingIncome || checkingWallet) {
+            //       // _height = 200;
+            //     }
+            //   });
+            // },
+            child: Tooltip(
+              message: 'Sales',
+              triggerMode: TooltipTriggerMode.tap,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: Get.width / 6,
+                    child: Image.asset(
+                      'assets/sales.png',
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white
+                          : Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.currency_rupee_rounded,
+                        size: 15,
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: b1Text(oCcy.format(up.totalReferral),
+                                textAlign: TextAlign.center,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        SizedBox(
+          width: Get.width / 3.3,
+          child: GestureDetector(
+            // onTap: () {
+            //   setState(() {
+            //     checkingWallet = !checkingWallet;
+            //     if (checkingWallet) {
+            //       checkingIncome = false;
+            //       checkingSales = false;
+            //     }
+            //     if (checkingSales || checkingIncome || checkingWallet) {
+            //       _height = 200;
+            //     }
+            //   });
+            // },
+            child: Tooltip(
+              message: 'Wallet',
+              triggerMode: TooltipTriggerMode.tap,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: Get.width / 7,
+                    child: Image.asset(
+                      'assets/wallet.png',
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white
+                          : Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.currency_rupee_rounded,
+                        size: 15,
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: b1Text(oCcy.format(up.totalWallet),
+                                textAlign: TextAlign.center,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  PreferredSize homeAppBar(BuildContext context) {
+    return PreferredSize(
+      preferredSize: const Size(double.infinity, kToolbarHeight + 20),
+      child: Card(
+        margin: const EdgeInsets.all(0),
+        shadowColor: scUp ? Colors.grey : Colors.transparent,
+        elevation: 15,
+        shape: RoundedRectangleBorder(
+          borderRadius:
+              BorderRadius.only(bottomLeft: Radius.circular(scUp ? 20 : 0)),
+        ),
+        color: scUp
+            ? Theme.of(context).scaffoldBackgroundColor.withOpacity(01)
+            : Theme.of(context).colorScheme.primary.withOpacity(0.0),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 0, sigmaY: 0),
+          child: SafeArea(
+            child: Row(
+              children: [
+                IconButton(
+                  tooltip: 'Menu',
+                  splashColor: Colors.transparent,
+                  highlightColor: Colors.transparent,
+                  icon: Icon(
+                    Icons.menu,
+                    color: refreshingHome
+                        ? Colors.white
+                        : Theme.of(context).iconTheme.color,
+                  ),
+                  onPressed: () {
+                    HapticFeedback.lightImpact();
+                    _scaffoldKey.currentState?.openDrawer();
+                  },
                 ),
-                const SizedBox(height: 100),
+                Expanded(
+                  child: Builder(builder: (context) {
+                    var fname = App.appname.split(' ').first;
+                    var lnames = App.appname.split(' ');
+                    lnames.removeAt(0);
+                    var lname = lnames.join(' ');
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        h5Text(
+                          fname,
+                          fontWeight: FontWeight.bold,
+                          color: refreshingHome
+                              ? Colors.white
+                              : Theme.of(context).textTheme.headline6!.color,
+                        ),
+                        capText(
+                          lname,
+                          fontWeight: FontWeight.bold,
+                          color: refreshingHome
+                              ? Colors.white
+                              : Theme.of(context).textTheme.headline6!.color,
+                        ),
+                      ],
+                    );
+                  }),
+                ),
+                Row(
+                  children: [
+                    h6Text(
+                      DateFormat('dd MMM yyyy').format(DateTime.now()),
+                      fontWeight: FontWeight.bold,
+                      color: refreshingHome
+                          ? Colors.white
+                          : Theme.of(context).textTheme.headline6!.color,
+                    ),
+                  ],
+                ),
+                const SizedBox(width: 10),
               ],
             ),
           ),
         ),
-      );
-    });
+      ),
+    );
+  }
+}
+
+class GiftCard {
+  final String giftName;
+  final double amount;
+  GiftCard({required this.giftName, required this.amount});
+}
+
+class ContainerPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint();
+    final path = Path();
+    paint.style = PaintingStyle.stroke;
+    paint.strokeWidth = 5;
+    paint.color = Colors.green;
+
+    path.moveTo(0, size.height * 0.9);
+    path.quadraticBezierTo(
+        0, size.height * 0.5, size.width * 0.2, size.height * 0.7);
+    path.quadraticBezierTo(size.width * 0.4, size.height * 0.9,
+        size.width * 0.5, size.height * 0.5);
+    path.quadraticBezierTo(size.width * 0.55, size.height * 0.3,
+        size.width * 0.65, size.height * 0.3);
+    path.quadraticBezierTo(size.width * 0.7, size.height * 0.3,
+        size.width * 0.75, size.height * 0.4);
+    path.quadraticBezierTo(size.width * 0.8, size.height * 0.45,
+        size.width * 0.85, size.height * .55);
+    path.quadraticBezierTo(
+        size.width * 0.95, size.height * 0.7, size.width, size.height);
+    path.lineTo(0, size.height);
+    path.lineTo(0, size.height * 0.9);
+    canvas.drawPath(path, paint);
+    final paint1 = Paint();
+    paint1.style = PaintingStyle.fill;
+    paint1.strokeWidth = 2;
+    paint1.color = Colors.yellow;
+    canvas.drawPath(path, paint1);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    // TODO: implement shouldRepaint
+    return false;
   }
 }
 
@@ -852,7 +1325,7 @@ class BarChartSample1State extends State<BarChartSample1> {
                     height: 4,
                   ),
                   const Text(
-                    'Last 7 days overview',
+                    'Last 7 months overview',
                     style: TextStyle(
                       // color: Color(0xff379982),
                       fontSize: 18,
@@ -959,7 +1432,7 @@ class BarChartSample1State extends State<BarChartSample1> {
           default:
             return throw Error();
         }
-      });
+      }).toList();
 
   BarChartData mainBarData() {
     return BarChartData(
@@ -967,7 +1440,11 @@ class BarChartSample1State extends State<BarChartSample1> {
         touchTooltipData: BarTouchTooltipData(
           tooltipBgColor: Colors.blueGrey,
           getTooltipItem: (group, groupIndex, rod, rodIndex) {
-            String weekDay = DateFormat('dd MMM yyyy').format(DateTime.now());
+            print(
+                'month is ${DateTime.now().subtract(Duration(days: groupIndex * 31))}');
+
+            String month = DateFormat('MMM yyyy').format(
+                DateTime.now().subtract(Duration(days: (6 - groupIndex) * 31)));
             // switch (group.x) {
             //   case 0:
             //     weekDay = 'Monday';
@@ -994,7 +1471,7 @@ class BarChartSample1State extends State<BarChartSample1> {
             //     throw Error();
             // }
             return BarTooltipItem(
-              '$weekDay\n',
+              '$month\n',
               const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
@@ -1002,7 +1479,8 @@ class BarChartSample1State extends State<BarChartSample1> {
               ),
               children: <TextSpan>[
                 TextSpan(
-                  text: (rod.toY - 1).toString(),
+                  text: NumberFormat.simpleCurrency(name: 'INR')
+                      .format(double.parse((rod.toY - 1).toString())),
                   style: const TextStyle(
                     color: Colors.yellow,
                     fontSize: 16,
@@ -1199,15 +1677,24 @@ class BarChartSample1State extends State<BarChartSample1> {
 
 class DashBoardCircleProgress extends StatefulWidget {
   /// Creates the instance of MyHomePage
-  DashBoardCircleProgress({Key? key}) : super(key: key);
-
+  DashBoardCircleProgress({Key? key, required this.total, required this.paid})
+      : super(key: key);
+  final double total;
+  final double paid;
   @override
   _DashBoardCircleProgressState createState() =>
       _DashBoardCircleProgressState();
 }
 
 class _DashBoardCircleProgressState extends State<DashBoardCircleProgress> {
-  double progressValue = 30;
+  late double progressValue;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    progressValue = (widget.paid / widget.total) * 100;
+  }
+
   Widget _getRadialGauge() {
     return SfRadialGauge(axes: <RadialAxis>[
       RadialAxis(
@@ -1239,34 +1726,35 @@ class _DashBoardCircleProgressState extends State<DashBoardCircleProgress> {
 
   Widget _getLinearGauge() {
     return Container(
-      child: SfLinearGauge(
-          minimum: 0.0,
-          maximum: 100.0,
-          orientation: LinearGaugeOrientation.horizontal,
-          majorTickStyle: const LinearTickStyle(length: 20),
-          axisLabelStyle: const TextStyle(fontSize: 12.0, color: Colors.black),
-          axisTrackStyle: const LinearAxisTrackStyle(
-              color: Colors.cyan,
-              edgeStyle: LinearEdgeStyle.bothFlat,
-              thickness: 15.0,
-              borderColor: Colors.grey)),
       margin: const EdgeInsets.all(10),
+      child: SfLinearGauge(
+        minimum: 0.0,
+        maximum: widget.total,
+        orientation: LinearGaugeOrientation.horizontal,
+        majorTickStyle: const LinearTickStyle(length: 20),
+        axisLabelStyle: const TextStyle(fontSize: 12.0, color: Colors.black),
+        axisTrackStyle: const LinearAxisTrackStyle(
+            color: Colors.cyan,
+            edgeStyle: LinearEdgeStyle.bothFlat,
+            thickness: 15.0,
+            borderColor: Colors.grey),
+      ),
     );
   }
 
   /// Returns normal style circular progress bars.
-  Widget getNormalProgressStyle() {
+  Widget _getNormalProgressStyle() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
-        Container(
+        SizedBox(
           height: 120,
           width: 120,
           child: SfRadialGauge(axes: <RadialAxis>[
             RadialAxis(
                 minimum: 0,
-                maximum: 100,
+                maximum: widget.total,
                 showLabels: false,
                 showTicks: false,
                 radiusFactor: 0.8,
@@ -1291,7 +1779,7 @@ class _DashBoardCircleProgressState extends State<DashBoardCircleProgress> {
                       positionFactor: 0.1,
                       angle: 90,
                       widget: Text(
-                        progressValue.toStringAsFixed(0) + ' / 100',
+                        '${progressValue.toStringAsFixed(0)} / 100',
                         style: const TextStyle(fontSize: 11),
                       ))
                 ])
@@ -1326,7 +1814,7 @@ class _DashBoardCircleProgressState extends State<DashBoardCircleProgress> {
                 annotations: <GaugeAnnotation>[
                   GaugeAnnotation(
                       positionFactor: 0,
-                      widget: Text(progressValue.toStringAsFixed(0) + '%'))
+                      widget: Text('${progressValue.toStringAsFixed(0)}%'))
                 ])
           ]),
         ),
@@ -1335,7 +1823,7 @@ class _DashBoardCircleProgressState extends State<DashBoardCircleProgress> {
   }
 
   /// Returns filled track style circular progress bar.
-  Widget getFilledTrackStyle() {
+  Widget _getFilledTrackStyle() {
     return Container(
         height: 120,
         width: 120,
@@ -1369,7 +1857,7 @@ class _DashBoardCircleProgressState extends State<DashBoardCircleProgress> {
               annotations: <GaugeAnnotation>[
                 GaugeAnnotation(
                     positionFactor: 0.5,
-                    widget: Text(progressValue.toStringAsFixed(0) + '%',
+                    widget: Text('${progressValue.toStringAsFixed(0)}%',
                         style: const TextStyle(
                             color: Colors.white, fontWeight: FontWeight.bold)))
               ])
@@ -1377,7 +1865,7 @@ class _DashBoardCircleProgressState extends State<DashBoardCircleProgress> {
   }
 
   /// Returns filled progress style circular progress bar.
-  Widget getFilledProgressStyle() {
+  Widget _getFilledProgressStyle() {
     return Container(
         height: 120,
         width: 120,
@@ -1412,6 +1900,9 @@ class _DashBoardCircleProgressState extends State<DashBoardCircleProgress> {
 
   /// Returns gradient progress style circular progress bar.
   Widget getGradientProgressStyle() {
+    // print('progress value $progressValue');
+    // print('progress value ${(widget.paid / widget.total)}');
+    // print('progress value ${widget.paid}  ${widget.total}');
     return SizedBox(
         height: 120,
         width: 120,
@@ -1422,6 +1913,8 @@ class _DashBoardCircleProgressState extends State<DashBoardCircleProgress> {
               startAngle: 270,
               endAngle: 270,
               radiusFactor: 0.8,
+              maximum: 100,
+              minimum: 0,
               axisLineStyle: const AxisLineStyle(
                 thickness: 0.1,
                 color: Color.fromARGB(30, 0, 169, 181),
@@ -1456,13 +1949,13 @@ class _DashBoardCircleProgressState extends State<DashBoardCircleProgress> {
               annotations: <GaugeAnnotation>[
                 GaugeAnnotation(
                     positionFactor: 0,
-                    widget: Text(progressValue.toStringAsFixed(0) + '%'))
+                    widget: Text('${progressValue.toStringAsFixed(0)}%'))
               ]),
         ]));
   }
 
   /// Returns thick progress style circular progress bar.
-  Widget getThickProgressStyle() {
+  Widget _getThickProgressStyle() {
     return Container(
         height: 120,
         width: 120,
@@ -1496,7 +1989,7 @@ class _DashBoardCircleProgressState extends State<DashBoardCircleProgress> {
   }
 
   /// Returns semi-circular style circular progress bar.
-  Widget getSemiCircleProgressStyle() {
+  Widget _getSemiCircleProgressStyle() {
     return Container(
         height: 120,
         width: 120,
@@ -1527,13 +2020,13 @@ class _DashBoardCircleProgressState extends State<DashBoardCircleProgress> {
               annotations: <GaugeAnnotation>[
                 GaugeAnnotation(
                     positionFactor: 0,
-                    widget: Text(progressValue.toStringAsFixed(0) + '%'))
+                    widget: Text('${progressValue.toStringAsFixed(0)}%'))
               ]),
         ]));
   }
 
   /// Returns segmented line style circular progress bar.
-  Widget getSegmentedProgressStyle() {
+  Widget _getSegmentedProgressStyle() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
@@ -1617,7 +2110,7 @@ class _DashBoardCircleProgressState extends State<DashBoardCircleProgress> {
                   GaugeAnnotation(
                       positionFactor: 0.2,
                       horizontalAlignment: GaugeAlignment.center,
-                      widget: Text(progressValue.toStringAsFixed(0) + '%'))
+                      widget: Text('${progressValue.toStringAsFixed(0)}%'))
                 ]),
             // Create secondary radial axis for segmented line
             RadialAxis(
@@ -1648,3 +2141,34 @@ class _DashBoardCircleProgressState extends State<DashBoardCircleProgress> {
     return getGradientProgressStyle();
   }
 }
+
+// class ToolTipCustomShape extends ShapeBorder {
+//   final bool usePadding;
+//   ToolTipCustomShape({this.usePadding = true});
+//
+//   @override
+//   EdgeInsetsGeometry get dimensions =>
+//       EdgeInsets.only(bottom: usePadding ? 20 : 0);
+//
+//   @override
+//   Path getInnerPath(Rect rect, { TextDirection? textDirection })=>Path();
+//
+//   @override
+//   Path getOuterPath(Rect rect, {TextDirection? textDirection}) {
+//     rect =
+//         Rect.fromPoints(rect.topLeft, rect.bottomRight - const Offset(0, 20));
+//     return Path()
+//       ..addRRect(
+//           RRect.fromRectAndRadius(rect, Radius.circular(rect.height / 3)))
+//       ..moveTo(rect.bottomCenter.dx - 10, rect.bottomCenter.dy)
+//       ..relativeLineTo(10, 20)
+//       ..relativeLineTo(10, -20)
+//       ..close();
+//   }
+//
+//   @override
+//   void paint(Canvas canvas, Rect rect, {TextDirection? textDirection}) {}
+//
+//   @override
+//   ShapeBorder scale(double t) => this;
+// }

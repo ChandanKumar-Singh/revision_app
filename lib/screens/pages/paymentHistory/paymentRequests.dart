@@ -56,16 +56,17 @@ class _RequestedPaymentsPageState extends State<RequestedPaymentsPage> {
           key: scaffoldKey,
           backgroundColor: Theme.of(context).cardColor.withOpacity(0.9),
           body: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Theme.of(context).colorScheme.primary.withOpacity(0.7),
-                  Theme.of(context).colorScheme.onBackground.withOpacity(1),
-                ],
-                stops: [0, 1],
-                begin: const AlignmentDirectional(0, -1),
-                end: const AlignmentDirectional(0, 1),
-              ),
+            decoration: const BoxDecoration(
+              // gradient: LinearGradient(
+              //   colors: [
+              //     Theme.of(context).colorScheme.primary.withOpacity(0.7),
+              //     Theme.of(context).colorScheme.onBackground.withOpacity(1),
+              //   ],
+              //   stops: [0, 1],
+              //   begin: const AlignmentDirectional(0, -1),
+              //   end: const AlignmentDirectional(0, 1),
+              // ),
+              
             ),
             child: NestedScrollView(
               headerSliverBuilder: (context, _) => [
@@ -85,7 +86,7 @@ class _RequestedPaymentsPageState extends State<RequestedPaymentsPage> {
                             showModalBottomSheet(
                                 context: context,
                                 builder: (context) {
-                                  return const DateFilterSheet(
+                                  return const PHDateFilterSheet(
                                     type: HistoryType.request,
                                   );
                                 });
@@ -205,200 +206,213 @@ class _RequestedPaymentsPageState extends State<RequestedPaymentsPage> {
                                       Padding(
                                         padding: const EdgeInsetsDirectional
                                             .fromSTEB(0, 30, 0, 0),
-                                        child: Container(
-                                          width: double.infinity,
-                                          // height: 70,
-                                          decoration: BoxDecoration(
-                                            // gradient: LinearGradient(
-                                            //   colors: [
-                                            //     Theme.of(context)
-                                            //         .colorScheme.secondary,
-                                            //     Theme.of(context)
-                                            //         .colorScheme.primary
-                                            //   ],
-                                            //   stops: [0, 1],
-                                            //   begin: const AlignmentDirectional(
-                                            //       0, -1),
-                                            //   end: const AlignmentDirectional(
-                                            //       0, 1),
-                                            // ),
-                                            color: Theme.of(context).cardColor,
-                                            border: Border.all(),
+                                        child: Card(
+                                          elevation: 10,
+                                          margin: const EdgeInsets.all(0),
+                                          shape: const RoundedRectangleBorder(
                                             borderRadius:
-                                                const BorderRadius.only(
+                                            BorderRadius.only(
                                               bottomLeft: Radius.circular(10),
                                               bottomRight: Radius.circular(10),
                                               topLeft: Radius.circular(0),
                                               topRight: Radius.circular(10),
                                             ),
                                           ),
-                                          child: Padding(
-                                            padding: const EdgeInsetsDirectional
-                                                .fromSTEB(10, 10, 10, 10),
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.max,
-                                              children: [
-                                                Expanded(
-                                                  child: Column(
-                                                    mainAxisSize:
-                                                        MainAxisSize.max,
-                                                    children: [
-                                                      Row(
-                                                        mainAxisSize:
-                                                            MainAxisSize.max,
-                                                        children: [
-                                                          Expanded(
-                                                            child: Text(
-                                                              'Requested for Rs. ${request.requestedAmount}',
-                                                              textAlign:
-                                                                  TextAlign
-                                                                      .start,
-                                                              style: Theme.of(
-                                                                      context)
-                                                                  .textTheme
-                                                                  .headline6,
-                                                            ),
-                                                          ),
-                                                          Container(
-                                                            // width: 100,
-                                                            // height: 30,
-                                                            padding:
-                                                                const EdgeInsets
-                                                                        .symmetric(
-                                                                    horizontal:
-                                                                        15,
-                                                                    vertical:
-                                                                        5),
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              color: status == 0
-                                                                  ? Colors
-                                                                      .yellow
-                                                                      .withOpacity(
-                                                                          0.2)
-                                                                  : status == 1
-                                                                      ? Colors
-                                                                          .green
-                                                                          .withOpacity(
-                                                                              0.2)
-                                                                      : Colors
-                                                                          .red
-                                                                          .withOpacity(
-                                                                              0.2),
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          40),
-                                                              border:
-                                                                  Border.all(
-                                                                color: status ==
-                                                                        0
-                                                                    ? Colors
-                                                                        .yellow
-                                                                    : status ==
-                                                                            1
-                                                                        ? Colors
-                                                                            .green
-                                                                        : Colors
-                                                                            .red,
+                                          child: Container(
+                                            width: double.infinity,
+                                            // height: 70,
+                                            decoration: BoxDecoration(
+                                              // gradient: LinearGradient(
+                                              //   colors: [
+                                              //     Theme.of(context)
+                                              //         .colorScheme.secondary,
+                                              //     Theme.of(context)
+                                              //         .colorScheme.primary
+                                              //   ],
+                                              //   stops: [0, 1],
+                                              //   begin: const AlignmentDirectional(
+                                              //       0, -1),
+                                              //   end: const AlignmentDirectional(
+                                              //       0, 1),
+                                              // ),
+                                              color: Theme.of(context).cardColor,
+                                              border: Border.all(),
+                                              borderRadius:
+                                                  const BorderRadius.only(
+                                                bottomLeft: Radius.circular(10),
+                                                bottomRight: Radius.circular(10),
+                                                topLeft: Radius.circular(0),
+                                                topRight: Radius.circular(10),
+                                              ),
+                                            ),
+                                            child: Padding(
+                                              padding: const EdgeInsetsDirectional
+                                                  .fromSTEB(10, 10, 10, 10),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.max,
+                                                children: [
+                                                  Expanded(
+                                                    child: Column(
+                                                      mainAxisSize:
+                                                          MainAxisSize.max,
+                                                      children: [
+                                                        Row(
+                                                          mainAxisSize:
+                                                              MainAxisSize.max,
+                                                          children: [
+                                                            Expanded(
+                                                              child: Text(
+                                                                'Requested for ${NumberFormat.simpleCurrency(name: 'INR').format(double.parse(request.requestedAmount??'0'))}',
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .start,
+                                                                style: Theme.of(
+                                                                        context)
+                                                                    .textTheme
+                                                                    .headline6,
                                                               ),
                                                             ),
-                                                            child: Row(
-                                                              mainAxisSize:
-                                                                  MainAxisSize
-                                                                      .max,
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .center,
-                                                              children: [
-                                                                Text(
-                                                                  status == 0
-                                                                      ? 'Waiting'
+                                                            Container(
+                                                              // width: 100,
+                                                              // height: 30,
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                          .symmetric(
+                                                                      horizontal:
+                                                                          15,
+                                                                      vertical:
+                                                                          5),
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                color: status == 0
+                                                                    ? Colors
+                                                                        .yellow
+                                                                        .withOpacity(
+                                                                            0.2)
+                                                                    : status == 1
+                                                                        ? Colors
+                                                                            .green
+                                                                            .withOpacity(
+                                                                                0.2)
+                                                                        : Colors
+                                                                            .red
+                                                                            .withOpacity(
+                                                                                0.2),
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            40),
+                                                                border:
+                                                                    Border.all(
+                                                                  color: status ==
+                                                                          0
+                                                                      ? Colors
+                                                                          .yellow
                                                                       : status ==
                                                                               1
-                                                                          ? "Received"
-                                                                          : "Rejected",
+                                                                          ? Colors
+                                                                              .green
+                                                                          : Colors
+                                                                              .red,
+                                                                ),
+                                                              ),
+                                                              child: Row(
+                                                                mainAxisSize:
+                                                                    MainAxisSize
+                                                                        .max,
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .center,
+                                                                children: [
+                                                                  Text(
+                                                                    status == 0
+                                                                        ? 'Waiting'
+                                                                        : status ==
+                                                                                1
+                                                                            ? "Received"
+                                                                            : "Rejected",
+                                                                    style: Theme.of(
+                                                                            context)
+                                                                        .textTheme
+                                                                        .bodyText1!
+                                                                        .copyWith(
+                                                                          fontFamily:
+                                                                              'Lato',
+                                                                          color: status ==
+                                                                                  0
+                                                                              ? Colors.yellow
+                                                                              : status == 1
+                                                                                  ? Colors.green
+                                                                                  : Colors.red,
+                                                                        ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        Row(
+                                                          mainAxisSize:
+                                                              MainAxisSize.max,
+                                                          children: [
+                                                            Expanded(
+                                                              child: Padding(
+                                                                padding:
+                                                                    const EdgeInsetsDirectional
+                                                                            .fromSTEB(
+                                                                        0,
+                                                                        5,
+                                                                        0,
+                                                                        0),
+                                                                child: Text(
+                                                                  'description : ${request.userComments}',
                                                                   style: Theme.of(
                                                                           context)
                                                                       .textTheme
-                                                                      .bodyText1!
-                                                                      .copyWith(
-                                                                        fontFamily:
-                                                                            'Lato',
-                                                                        color: status ==
-                                                                                0
-                                                                            ? Colors.yellow
-                                                                            : status == 1
-                                                                                ? Colors.green
-                                                                                : Colors.red,
-                                                                      ),
+                                                                      .headline6,
                                                                 ),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      Row(
-                                                        mainAxisSize:
-                                                            MainAxisSize.max,
-                                                        children: [
-                                                          Expanded(
-                                                            child: Padding(
-                                                              padding:
-                                                                  const EdgeInsetsDirectional
-                                                                          .fromSTEB(
-                                                                      0,
-                                                                      5,
-                                                                      0,
-                                                                      0),
-                                                              child: Text(
-                                                                'description : ${request.userComments}',
-                                                                style: Theme.of(
-                                                                        context)
-                                                                    .textTheme
-                                                                    .headline6,
                                                               ),
                                                             ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      Row(
-                                                        mainAxisSize:
-                                                            MainAxisSize.max,
-                                                        children: [
-                                                          const Icon(
-                                                            Icons
-                                                                .mark_chat_unread_outlined,
-                                                            size: 15,
-                                                          ),
-                                                          const SizedBox(
-                                                              width: 10),
-                                                          Expanded(
-                                                            child: Padding(
-                                                              padding:
-                                                                  const EdgeInsetsDirectional
-                                                                          .fromSTEB(
-                                                                      0,
-                                                                      5,
-                                                                      0,
-                                                                      0),
-                                                              child: Text(
-                                                                (request.adminComments ??
-                                                                        '')
-                                                                    .capitalize!,
-                                                                style: Theme.of(
-                                                                        context)
-                                                                    .textTheme
-                                                                    .headline6,
+                                                          ],
+                                                        ),
+                                                        Row(
+                                                          mainAxisSize:
+                                                              MainAxisSize.max,
+                                                          children: [
+                                                            const Icon(
+                                                              Icons
+                                                                  .mark_chat_unread_outlined,
+                                                              size: 15,
+                                                            ),
+                                                            const SizedBox(
+                                                                width: 10),
+                                                            Expanded(
+                                                              child: Padding(
+                                                                padding:
+                                                                    const EdgeInsetsDirectional
+                                                                            .fromSTEB(
+                                                                        0,
+                                                                        5,
+                                                                        0,
+                                                                        0),
+                                                                child: Text(
+                                                                  (request.adminComments ??
+                                                                          '')
+                                                                      .capitalize!,
+                                                                  style: Theme.of(
+                                                                          context)
+                                                                      .textTheme
+                                                                      .headline6,
+                                                                ),
                                                               ),
                                                             ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ],
+                                                          ],
+                                                        ),
+                                                      ],
+                                                    ),
                                                   ),
-                                                ),
-                                              ],
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         ),

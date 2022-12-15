@@ -1,3 +1,5 @@
+import 'package:revision/models/receivedEmiModel.dart';
+
 class TeamMember {
   int? id;
   String? username;
@@ -20,29 +22,32 @@ class TeamMember {
   String? createdAt;
   String? updatedAt;
   String? fullName;
+  List<ReceivedEmi>? emiReceived;
 
-  TeamMember(
-      {this.id,
-      this.username,
-      this.sponsorId,
-      this.email,
-      this.firstName,
-      this.lastName,
-      this.phone,
-      this.status,
-      this.designationId,
-      this.address,
-      this.projectId,
-      this.plotNo,
-      this.plotArea,
-      this.plotRate,
-      this.plotDiscount,
-      this.plotTotalPrice,
-      this.emiTerm,
-      this.image,
-      this.createdAt,
-      this.updatedAt,
-      this.fullName});
+  TeamMember({
+    this.id,
+    this.username,
+    this.sponsorId,
+    this.email,
+    this.firstName,
+    this.lastName,
+    this.phone,
+    this.status,
+    this.designationId,
+    this.address,
+    this.projectId,
+    this.plotNo,
+    this.plotArea,
+    this.plotRate,
+    this.plotDiscount,
+    this.plotTotalPrice,
+    this.emiTerm,
+    this.image,
+    this.createdAt,
+    this.updatedAt,
+    this.fullName,
+    this.emiReceived,
+  });
 
   TeamMember.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -66,31 +71,33 @@ class TeamMember {
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
     fullName = json['fullName'];
+    emiReceived =
+        List.from(json['emi_receiveds'].map((e) => ReceivedEmi.fromJson(e)));
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['username'] = this.username;
-    data['sponsor_id'] = this.sponsorId;
-    data['email'] = this.email;
-    data['first_name'] = this.firstName;
-    data['last_name'] = this.lastName;
-    data['phone'] = this.phone;
-    data['status'] = this.status;
-    data['designation_id'] = this.designationId;
-    data['address'] = this.address;
-    data['project_id'] = this.projectId;
-    data['plot_no'] = this.plotNo;
-    data['plot_area'] = this.plotArea;
-    data['plot_rate'] = this.plotRate;
-    data['plot_discount'] = this.plotDiscount;
-    data['plot_total_price'] = this.plotTotalPrice;
-    data['emi_term'] = this.emiTerm;
-    data['image'] = this.image;
-    data['created_at'] = this.createdAt;
-    data['updated_at'] = this.updatedAt;
-    data['fullName'] = this.fullName;
+    final Map<String, dynamic> data = Map<String, dynamic>();
+    data['id'] = id;
+    data['username'] = username;
+    data['sponsor_id'] = sponsorId;
+    data['email'] = email;
+    data['first_name'] = firstName;
+    data['last_name'] = lastName;
+    data['phone'] = phone;
+    data['status'] = status;
+    data['designation_id'] = designationId;
+    data['address'] = address;
+    data['project_id'] = projectId;
+    data['plot_no'] = plotNo;
+    data['plot_area'] = plotArea;
+    data['plot_rate'] = plotRate;
+    data['plot_discount'] = plotDiscount;
+    data['plot_total_price'] = plotTotalPrice;
+    data['emi_term'] = emiTerm;
+    data['image'] = image;
+    data['created_at'] = createdAt;
+    data['updated_at'] = updatedAt;
+    data['fullName'] = fullName;
     return data;
   }
 }

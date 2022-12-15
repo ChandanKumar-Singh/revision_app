@@ -12,6 +12,7 @@ import 'package:revision/providers/AuthProvider.dart';
 import 'package:revision/providers/PaymentsHistoryProvider.dart';
 import 'package:revision/providers/ThemeProvider.dart';
 import 'package:revision/providers/UserProvider.dart';
+import 'package:revision/providers/myIncomeProvider.dart';
 import 'package:revision/providers/paidPaymentsProvider.dart';
 import 'package:revision/providers/teamCcontroller.dart';
 import 'package:revision/screens/auth/launchScreen.dart';
@@ -98,6 +99,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => TeamProvider()),
         ChangeNotifierProvider(create: (context) => PaidPaymentsProvider()),
         ChangeNotifierProvider(create: (context) => PaymentsHistoryProvider()),
+        ChangeNotifierProvider(create: (context) => MyIncomeProvider()),
       ],
       child: ScreenUtilInit(
           designSize: Size(Get.width, Get.height),
@@ -111,15 +113,16 @@ class MyApp extends StatelessWidget {
                 themeMode: tp.themeMode,
                 theme: ThemeData(
                   textTheme: TextTheme(
-                    headline6: GoogleFonts.actor(),
-                    headline5: GoogleFonts.actor(),
-                    headline4: GoogleFonts.actor(),
-                    headline3: GoogleFonts.actor(),
-                    headline2: GoogleFonts.actor(),
-                    headline1: GoogleFonts.actor(),
-                    bodyText2: GoogleFonts.actor(),
-                    bodyText1: GoogleFonts.actor(),
-                    caption: GoogleFonts.actor(),
+                    headline6: GoogleFonts.aBeeZee(),
+                    headline5: GoogleFonts.aBeeZee(),
+                    headline4: GoogleFonts.aBeeZee(),
+                    headline3: GoogleFonts.aBeeZee(),
+                    headline2: GoogleFonts.aBeeZee(),
+                    headline1: GoogleFonts.aBeeZee(),
+                    bodyText2: GoogleFonts.aBeeZee(),
+                    bodyText1: GoogleFonts.aBeeZee(),
+                    caption: GoogleFonts.aBeeZee(),
+                    // caption: GoogleFonts.actor(),
                   ),
                   primarySwatch: MaterialColor(
                     App.swatchCode,
@@ -153,15 +156,16 @@ class MyApp extends StatelessWidget {
                 ),
                 darkTheme: ThemeData(
                   textTheme: TextTheme(
-                    headline6: GoogleFonts.actor(),
-                    headline5: GoogleFonts.actor(),
-                    headline4: GoogleFonts.actor(),
-                    headline3: GoogleFonts.actor(),
-                    headline2: GoogleFonts.actor(),
-                    headline1: GoogleFonts.actor(),
-                    bodyText2: GoogleFonts.actor(),
-                    bodyText1: GoogleFonts.actor(),
-                    caption: GoogleFonts.actor(),
+                    headline6: GoogleFonts.aBeeZee(),
+                    headline5: GoogleFonts.aBeeZee(),
+                    headline4: GoogleFonts.aBeeZee(),
+                    headline3: GoogleFonts.aBeeZee(),
+                    headline2: GoogleFonts.aBeeZee(),
+                    headline1: GoogleFonts.aBeeZee(),
+                    bodyText2: GoogleFonts.aBeeZee(),
+                    bodyText1: GoogleFonts.aBeeZee(),
+                    caption: GoogleFonts.aBeeZee(),
+                    // caption: GoogleFonts.actor(),
                   ),
                   primarySwatch: MaterialColor(
                     App.swatchCode2,

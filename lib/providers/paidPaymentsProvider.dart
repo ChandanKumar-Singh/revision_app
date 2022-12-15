@@ -15,17 +15,21 @@ class PaidPaymentsProvider extends ChangeNotifier {
   List<PaidPaymentsModel> payments = <PaidPaymentsModel>[];
   int page = 1;
   int total = 0;
-  double toBePaid = 0;
-  double totalPaid = 0;
+  String toBePaid = '0.0';
+  String totalPaid = '0.0';
+  String totalAmount = '0.0';
 
-  Future<void> getTeam() async {
+  Future<void> getPaimentHistory(bool loader) async {
     var response;
 
     try {
       bool cacheExist =
           await APICacheManager().isAPICacheKeyExist('paymentHistory');
-      hoverLoadingDialog(true);
-
+      if (loader) {
+        hoverLoadingDialog(true);
+      }
+      loadingMembers = true;
+      notifyListeners();
       if (isOnline) {
         var url = '${App.baseUrl}${App.paymentHistory}?page=$page';
         var headers = {
@@ -38,9 +42,9 @@ class PaidPaymentsProvider extends ChangeNotifier {
         debugPrint(res.body);
         if (res.statusCode == 200) {
           if (jsonDecode(res.body)['success'] == 200) {
-            var data = jsonDecode(res.body)['data'];
-            var cacheModel = APICacheDBModel(
-                key: 'paymentHistory', syncData: jsonEncode(data));
+            var data = jsonDecode(res.body);
+            var cacheModel =
+                APICacheDBModel(key: 'paymentHistory', syncData: res.body);
 
             await APICacheManager().addCacheData(cacheModel);
             response = cacheModel.syncData;
@@ -48,8 +52,7 @@ class PaidPaymentsProvider extends ChangeNotifier {
             Fluttertoast.showToast(msg: jsonDecode(res.body)['message']);
           }
         }
-        print(
-            "it's url Hit   ${jsonDecode(res.body)['data'] == 0 ? jsonDecode(res.body)['data'] : jsonDecode(res.body)['data']['total']} $response ");
+        print("it's url Hit   ");
       } else {
         showNetWorkToast();
         if (cacheExist) {
@@ -60,24 +63,35 @@ class PaidPaymentsProvider extends ChangeNotifier {
       }
       response = jsonDecode(response);
       if (response != null) {
-        if (response != 0) {
-          total = response['total'];
+        if (response['data'] != 0) {
+          // print("it's response Hit ${response}");
+          // print("it's response Hit ${response['data']['data']}");
+
+          totalAmount = response['total_payment'].toString();
+          totalPaid = response['total_deposited'].toString();
+          toBePaid = response['total_dues'].toString();
           payments.clear();
-          response['data'].forEach((e) {
+          response['data']['data'].forEach((e) {
+            // print(e);
             payments.add(PaidPaymentsModel.fromJson(e));
-            totalPaid+=double.parse(PaidPaymentsModel.fromJson(e).amount??'0');
+            // totalPaid += PaidPaymentsModel.fromJson(e).amount ?? '0';
           });
         } else {
           total = response;
         }
       }
-      hoverLoadingDialog(false);
+      if (loader) {
+        hoverLoadingDialog(false);
+      }
     } catch (e) {
       debugPrint('e e e e e e e -> $e');
-      hoverLoadingDialog(false);
+      if (loader) {
+        hoverLoadingDialog(false);
+      }
     }
 
     print('testing PaidPayments History ------ >$total    ${payments.length}');
+    loadingMembers = false;
     notifyListeners();
   }
 }

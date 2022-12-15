@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:loading_animations/loading_animations.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
@@ -12,6 +13,8 @@ import 'package:revision/functions.dart';
 import 'package:revision/providers/AuthProvider.dart';
 import 'package:revision/providers/ThemeProvider.dart';
 import 'package:revision/providers/UserProvider.dart';
+import 'package:revision/providers/paidPaymentsProvider.dart';
+import 'package:revision/screens/pages/myPaidPayments.dart';
 import 'package:revision/screens/profile/editProfile.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -282,9 +285,13 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                         SizedBox(height: Get.height * 0.03),
                         Builder(builder: (context) {
-                          double paid = 30000;
-                          double purchasePaid = (paid /
-                              double.parse(up.associate.data!.plotTotalPrice!));
+                          double paid = double.parse(
+                              Provider.of<PaidPaymentsProvider>(context,
+                                      listen: false)
+                                  .totalPaid);
+                          double percentPaid = (paid /
+                              double.parse(
+                                  up.associate.data!.plotTotalPrice ?? '0'));
                           return Card(
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
@@ -331,14 +338,18 @@ class _ProfilePageState extends State<ProfilePage> {
                                       Row(
                                         children: [
                                           h6Text(
-                                            'Purchase Amount : Rs. ',
+                                            'Purchase Amount : ',
                                             // color: Colors.white,
                                           ),
                                           h6Text(
-                                            (up.associate.data!
-                                                        .plotTotalPrice ??
-                                                    '')
-                                                .capitalize!,
+                                            NumberFormat.simpleCurrency(
+                                                    name: 'INR')
+                                                .format(double.parse((up
+                                                            .associate
+                                                            .data!
+                                                            .plotTotalPrice ??
+                                                        '0')
+                                                    .capitalize!)),
                                             // color: Colors.white,
                                           ),
                                         ],
@@ -360,12 +371,18 @@ class _ProfilePageState extends State<ProfilePage> {
                                       Row(
                                         children: [
                                           h6Text(
-                                            'Rate : Rs. ',
+                                            'Rate : ',
                                             // color: Colors.white,
                                           ),
                                           h6Text(
-                                            (up.associate.data!.plotRate ?? '')
-                                                .capitalize!,
+                                            NumberFormat.simpleCurrency(
+                                                    name: 'INR')
+                                                .format(double.parse((up
+                                                            .associate
+                                                            .data!
+                                                            .plotRate ??
+                                                        '0')
+                                                    .capitalize!)),
                                             // color: Colors.white,
                                           ),
                                         ],
@@ -374,13 +391,18 @@ class _ProfilePageState extends State<ProfilePage> {
                                       Row(
                                         children: [
                                           h6Text(
-                                            'Discount : Rs. ',
+                                            'Discount : ',
                                             // color: Colors.white,
                                           ),
                                           h6Text(
-                                            (up.associate.data!.plotDiscount ??
-                                                    '')
-                                                .capitalize!,
+                                            NumberFormat.simpleCurrency(
+                                                    name: 'INR')
+                                                .format(double.parse((up
+                                                            .associate
+                                                            .data!
+                                                            .plotDiscount ??
+                                                        '0')
+                                                    .capitalize!)),
                                           ),
                                         ],
                                       ),
@@ -395,7 +417,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                               BorderRadius.circular(10),
                                           child: LinearProgressIndicator(
                                             minHeight: 15,
-                                            value: purchasePaid,
+                                            value: percentPaid,
                                           ),
                                         ),
                                       ),
@@ -416,19 +438,21 @@ class _ProfilePageState extends State<ProfilePage> {
                                           //   // color: Colors.white,
                                           // ),
                                           h6Text(
-                                            '  ${(purchasePaid * 100).toStringAsFixed(2)} %',
+                                            '  ${(percentPaid * 100).toStringAsFixed(2)} %',
                                             // color: Colors.white,
                                           ),
                                         ],
                                       ),
                                       TextButton(
                                         onPressed: () {
-                                          // Navigator.push(
-                                          //     context,
-                                          //     slideLeftRoute(const EditProfile(),
-                                          //         effect: PageTransitionType
-                                          //             .rightToLeftJoined,
-                                          //         current: const ProfilePage()));
+                                          Navigator.push(
+                                              context,
+                                              slideLeftRoute(
+                                                  const MyPaidPaymentsPage(),
+                                                  effect: PageTransitionType
+                                                      .rightToLeftJoined,
+                                                  current:
+                                                      const ProfilePage()));
                                         },
                                         child: h6Text(
                                           'Details',
@@ -593,12 +617,15 @@ class PhoneVerificationSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BottomSheet(
-        onClosing: () {},
-        enableDrag: false,
-        builder: (context) {
-          return Consumer<AuthProvider>(builder: (context, ap, _) {
-            print(ap.phoneController.text);
+    return Consumer<AuthProvider>(builder: (context, ap, _) {
+      print(ap.phoneController.text);
+      return BottomSheet(
+          onClosing: () {
+            ap.phoneController.clear();
+            ap.otpController.clear();
+          },
+          enableDrag: false,
+          builder: (context) {
             return Container(
               height: Get.height * 0.6,
               padding: const EdgeInsets.all(8.0),
@@ -614,7 +641,7 @@ class PhoneVerificationSheet extends StatelessWidget {
                           children: [
                             Expanded(
                                 child: h6Text('Please verify your identity',
-                                    color: Colors.redAccent)),
+                                    color: Colors.blue)),
                           ],
                         ),
                         const SizedBox(height: 10),
@@ -626,7 +653,7 @@ class PhoneVerificationSheet extends StatelessWidget {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 7),
+                        const SizedBox(height: 20),
                         Row(
                           children: [
                             SizedBox(width: Get.width * 0.05),
@@ -642,7 +669,7 @@ class PhoneVerificationSheet extends StatelessWidget {
                                 )),
                             const SizedBox(width: 10),
                             Expanded(
-                                flex: 8,
+                                flex: 10,
                                 child: TextField(
                                   controller: ap.phoneController,
                                   decoration: const InputDecoration(
@@ -653,16 +680,16 @@ class PhoneVerificationSheet extends StatelessWidget {
                             SizedBox(width: Get.width * 0.1),
                           ],
                         ),
-                        const SizedBox(height: 5),
+                        const SizedBox(height: 20),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
-                            ElevatedButton(
-                              onPressed: () {
-                                Get.back();
-                              },
-                              child: const Text('Cancel'),
-                            ),
+                            // ElevatedButton(
+                            //   onPressed: () {
+                            //     Get.back();
+                            //   },
+                            //   child: const Text('Cancel'),
+                            // ),
                             ElevatedButton(
                               onPressed: () async {
                                 await ap.phoneVerification(
@@ -673,7 +700,7 @@ class PhoneVerificationSheet extends StatelessWidget {
                                             .phone ??
                                         '');
                               },
-                              child: const Text('Submit'),
+                              child: const Text('Send OTP'),
                             ),
                           ],
                         ),
@@ -687,8 +714,16 @@ class PhoneVerificationSheet extends StatelessWidget {
                         Row(
                           children: [
                             Expanded(
-                                child: h6Text('Otp has been sent',
-                                    color: Colors.redAccent)),
+                                child: Row(
+                              children: [
+                                h6Text('Otp has been sent to ',
+                                    color: Colors.blue),
+                                h6Text(
+                                  '+91${ap.phoneController.text}',
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                              ],
+                            )),
                           ],
                         ),
                         const SizedBox(height: 10),
@@ -699,20 +734,24 @@ class PhoneVerificationSheet extends StatelessWidget {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 7),
+                        const SizedBox(height: 20),
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Expanded(
-                                child: TextField(
-                              controller: ap.otpController,
-                              decoration: const InputDecoration(
-                                  contentPadding:
-                                      EdgeInsets.symmetric(horizontal: 10)),
-                              keyboardType: TextInputType.number,
-                            )),
+                            SizedBox(
+                              width: Get.width / 2,
+                              child: TextField(
+                                controller: ap.otpController,
+                                textAlign: TextAlign.center,
+                                decoration: const InputDecoration(
+                                    contentPadding:
+                                        EdgeInsets.symmetric(horizontal: 10)),
+                                keyboardType: TextInputType.number,
+                              ),
+                            ),
                           ],
                         ),
-                        const SizedBox(height: 5),
+                        const SizedBox(height: 20),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
@@ -732,7 +771,7 @@ class PhoneVerificationSheet extends StatelessWidget {
               ),
             );
           });
-        });
+    });
   }
 }
 

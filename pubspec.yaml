@@ -75,6 +75,11 @@ dependencies:
   fl_chart: ^0.55.2
   syncfusion_flutter_gauges: ^20.3.59
   flutter_phone_direct_caller: ^2.1.1
+  fvm: ^2.4.1
+  skeleton_loader: ^2.0.0+4
+  flutter_neumorphic: ^3.2.0
+  custom_refresh_indicator: ^2.0.1
+  liquid_pull_to_refresh: ^3.0.1
 dev_dependencies:
   flutter_test:
     sdk: flutter

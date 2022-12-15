@@ -14,6 +14,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -28,6 +29,15 @@ import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 
 import 'constants/widgets.dart';
 
+// final oCcy = NumberFormat(
+//   // "#,##0.00",
+//   "#.##0,00",
+//   "en_US",
+// );
+final oCcy = NumberFormat.simpleCurrency(name: '');
+
+enum UserType { associate, customer }
+
 ///FCM
 FirebaseMessaging messaging = FirebaseMessaging.instance;
 var deviceToken;
@@ -35,7 +45,7 @@ String fcmWebServerKey =
     'AAAAUpjhLsk:APA91bGmCC8UZOsc9BPjjHceQaJIce-6ahoOXCT6b5uTuUZQIlaS4FB1s7FQrjkDb4m-Q68YBlKbZ9JCuTIspoQ3-QmG_YvyC8g9X0VID5m4dUEzbPYMycys3uVKEVuq77QaupJRQZgj';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-FlutterLocalNotificationsPlugin();
+    FlutterLocalNotificationsPlugin();
 
 Future<void> setupFCM() async {
   NotificationSettings settings = await messaging.requestPermission(
@@ -111,16 +121,14 @@ Future<void> initFCM() async {
           ));
     }
   });
-
 }
 
-Future<void> saveTokenToDB(String token,String id) async {
-
+Future<void> saveTokenToDB(String token, String id) async {
   await FirebaseFirestore.instance
       .collection(App.appname)
       .doc(id)
-      .set({'token': token})
-      .then((value) => debugPrint('Token saved to both Laravel Db'));
+      .set({'token': token}).then(
+          (value) => debugPrint('Token saved to both Laravel Db'));
 }
 
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -160,6 +168,9 @@ Route slideLeftRoute(
 }
 
 bool isOnline = false;
+bool updateAvailable = false;
+// String appPackageName='com.crm.crm_application';
+String appPackageName = 'com.crm.sca_crm';
 bool isLogin = false;
 late SharedPreferences prefs;
 var downloadedProfileImagePath = '';
@@ -169,6 +180,7 @@ FirebaseAuth auth = FirebaseAuth.instance;
 void connectionSetup() async {
   var connection = await Connectivity().checkConnectivity();
   isOnline = connection != ConnectivityResult.none;
+
   Connectivity().onConnectivityChanged.listen((event) {
     isOnline = event != ConnectivityResult.none;
     debugPrint(' now we are online $isOnline');
@@ -184,7 +196,7 @@ void checkLogin() async {
   if (token != null) {
     isLogin = true;
   }
-  Timer(const Duration(seconds: 5), () async {
+  Timer(const Duration(seconds: 1), () async {
     if (!isLogin) {
       Get.offAll(const OnBoarding());
     } else {

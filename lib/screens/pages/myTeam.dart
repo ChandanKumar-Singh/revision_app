@@ -89,49 +89,59 @@ class _UserslistWidgetState extends State<UserslistWidget> {
                 //   ],
                 // ),
                 Expanded(
-                  child: Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 12),
-                    child: ListView.builder(
-                      padding: EdgeInsets.zero,
-                      primary: false,
-                      shrinkWrap: true,
-                      scrollDirection: Axis.vertical,
-                      itemCount: tp.members.length,
-                      itemBuilder: (context, i) {
-                        var member = tp.members[i];
+                  child: ListView.builder(
+                    padding: EdgeInsets.zero,
+                    primary: false,
+                    shrinkWrap: true,
+                    scrollDirection: Axis.vertical,
+                    itemCount: tp.members.length,
+                    itemBuilder: (context, i) {
+                      var member = tp.members[i];
+                      double totalPaid = 0;
 
-                        return Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(
-                              16, i == 0 ? 20 : 5, 16, 8),
+                      member.emiReceived!.forEach((element) {
+                        totalPaid += double.parse(element.amount!);
+                      });
+                      double totalDue =
+                          double.parse(member.plotTotalPrice!) - totalPaid;
+                      return Padding(
+                        padding: EdgeInsetsDirectional.fromSTEB(
+                            10, i == 0 ? 20 : 5, 10, 16),
+                        child: Card(
+                          elevation: 7,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                           child: Container(
                             width: double.infinity,
                             decoration: BoxDecoration(
                               color: Get.theme.cardColor,
-                              boxShadow: const [
-                                BoxShadow(
-                                  blurRadius: 3,
-                                  offset: Offset(0, 1),
-                                )
-                              ],
-                              borderRadius: BorderRadius.circular(8),
+                              // boxShadow: const [
+                              //   BoxShadow(
+                              //     blurRadius: 3,
+                              //     offset: Offset(0, 1),
+                              //   )
+                              // ],
+                              borderRadius: BorderRadius.circular(12),
                             ),
                             child: Column(
                               mainAxisSize: MainAxisSize.max,
                               children: [
                                 Padding(
-                                  padding:
-                                  const EdgeInsetsDirectional.fromSTEB(
+                                  padding: const EdgeInsetsDirectional.fromSTEB(
                                       12, 4, 12, 4),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.max,
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Padding(
                                         padding: const EdgeInsetsDirectional
                                             .fromSTEB(0, 4, 0, 0),
                                         child: Text(
-                                          '${member.designationId ?? ' '}',
+                                          member.designationId == 1
+                                              ? 'Customer'
+                                              : "Associate",
                                           style: const TextStyle(
                                             fontFamily: 'Lexend Deca',
                                             fontSize: 14,
@@ -142,9 +152,9 @@ class _UserslistWidgetState extends State<UserslistWidget> {
                                       ),
                                       Text(
                                         member.createdAt != null
-                                            ? DateFormat('dd MMM yyyy')
-                                            .format(DateTime.parse(
-                                            member.createdAt!))
+                                            ? DateFormat('dd MMM yyyy').format(
+                                                DateTime.parse(
+                                                    member.createdAt!))
                                             : '',
                                         style: Get.textTheme.bodyText1,
                                       ),
@@ -152,14 +162,13 @@ class _UserslistWidgetState extends State<UserslistWidget> {
                                   ),
                                 ),
                                 Container(
-                                  width: MediaQuery.of(context).size.width *
-                                      0.85,
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.85,
                                   height: 1,
                                   decoration: const BoxDecoration(),
                                 ),
                                 Padding(
-                                  padding:
-                                  const EdgeInsetsDirectional.fromSTEB(
+                                  padding: const EdgeInsetsDirectional.fromSTEB(
                                       12, 4, 12, 4),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.max,
@@ -169,8 +178,8 @@ class _UserslistWidgetState extends State<UserslistWidget> {
                                             .fromSTEB(0, 4, 0, 0),
                                         child: Text(
                                           member.fullName ?? '',
-                                          style: Get.textTheme.subtitle1!
-                                              .copyWith(
+                                          style:
+                                              Get.textTheme.subtitle1!.copyWith(
                                             fontFamily: 'Lexend Deca',
                                             fontSize: 18,
                                             fontWeight: FontWeight.w500,
@@ -181,8 +190,7 @@ class _UserslistWidgetState extends State<UserslistWidget> {
                                   ),
                                 ),
                                 Padding(
-                                  padding:
-                                  const EdgeInsetsDirectional.fromSTEB(
+                                  padding: const EdgeInsetsDirectional.fromSTEB(
                                       12, 4, 12, 4),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.max,
@@ -197,21 +205,20 @@ class _UserslistWidgetState extends State<UserslistWidget> {
                                               child: Icon(
                                                 Icons.call,
                                                 size: 20,
+                                                color: Colors.green,
                                               ),
                                             ),
                                             Padding(
                                               padding:
-                                              const EdgeInsetsDirectional
-                                                  .fromSTEB(4, 0, 0, 0),
+                                                  const EdgeInsetsDirectional
+                                                      .fromSTEB(4, 0, 0, 0),
                                               child: Text(
                                                 member.phone ?? 'N/A',
-                                                style: Get
-                                                    .textTheme.bodyText1!
+                                                style: Get.textTheme.bodyText1!
                                                     .copyWith(
                                                   fontFamily: 'Lexend Deca',
                                                   fontSize: 14,
-                                                  fontWeight:
-                                                  FontWeight.w500,
+                                                  fontWeight: FontWeight.w500,
                                                 ),
                                               ),
                                             ),
@@ -222,29 +229,29 @@ class _UserslistWidgetState extends State<UserslistWidget> {
                                         child: Row(
                                           mainAxisSize: MainAxisSize.max,
                                           mainAxisAlignment:
-                                          MainAxisAlignment.start,
+                                              MainAxisAlignment.start,
                                           children: [
-                                            const Padding(
-                                              padding: EdgeInsetsDirectional
-                                                  .fromSTEB(0, 0, 0, 4),
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsetsDirectional
+                                                      .fromSTEB(0, 0, 0, 4),
                                               child: Icon(
-                                                Icons
-                                                    .local_activity_outlined,
+                                                Icons.local_activity,
                                                 size: 20,
+                                                color: Get
+                                                    .theme.colorScheme.primary,
                                               ),
                                             ),
                                             Padding(
                                               padding:
-                                              const EdgeInsetsDirectional
-                                                  .fromSTEB(4, 0, 0, 0),
+                                                  const EdgeInsetsDirectional
+                                                      .fromSTEB(4, 0, 0, 0),
                                               child: Text(
                                                 member.status ?? '',
-                                                style: Get
-                                                    .textTheme.bodyText1!
+                                                style: Get.textTheme.bodyText1!
                                                     .copyWith(
                                                   fontFamily: 'Lexend Deca',
-                                                  fontWeight:
-                                                  FontWeight.w500,
+                                                  fontWeight: FontWeight.w500,
                                                 ),
                                               ),
                                             ),
@@ -255,8 +262,7 @@ class _UserslistWidgetState extends State<UserslistWidget> {
                                   ),
                                 ),
                                 Padding(
-                                  padding:
-                                  const EdgeInsetsDirectional.fromSTEB(
+                                  padding: const EdgeInsetsDirectional.fromSTEB(
                                       12, 0, 12, 0),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.max,
@@ -269,23 +275,21 @@ class _UserslistWidgetState extends State<UserslistWidget> {
                                               padding: EdgeInsetsDirectional
                                                   .fromSTEB(0, 0, 0, 4),
                                               child: Icon(
-                                                Icons.local_atm_sharp,
+                                                Icons.email_rounded,
                                                 size: 20,
                                               ),
                                             ),
                                             Padding(
                                               padding:
-                                              const EdgeInsetsDirectional
-                                                  .fromSTEB(4, 0, 0, 0),
+                                                  const EdgeInsetsDirectional
+                                                      .fromSTEB(4, 0, 0, 0),
                                               child: Text(
                                                 member.email ?? 'N/A',
-                                                style: Get
-                                                    .textTheme.bodyText1!
+                                                style: Get.textTheme.bodyText1!
                                                     .copyWith(
                                                   fontFamily: 'Lexend Deca',
                                                   fontSize: 14,
-                                                  fontWeight:
-                                                  FontWeight.w500,
+                                                  fontWeight: FontWeight.w500,
                                                 ),
                                               ),
                                             ),
@@ -296,8 +300,7 @@ class _UserslistWidgetState extends State<UserslistWidget> {
                                   ),
                                 ),
                                 Padding(
-                                  padding:
-                                  const EdgeInsetsDirectional.fromSTEB(
+                                  padding: const EdgeInsetsDirectional.fromSTEB(
                                       12, 4, 12, 4),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.max,
@@ -311,47 +314,24 @@ class _UserslistWidgetState extends State<UserslistWidget> {
                                           mainAxisSize: MainAxisSize.max,
                                           children: [
                                             Row(
-                                              mainAxisSize:
-                                              MainAxisSize.max,
+                                              mainAxisSize: MainAxisSize.max,
                                               children: [
+
                                                 Padding(
                                                   padding:
-                                                  const EdgeInsetsDirectional
-                                                      .fromSTEB(
-                                                      4, 0, 0, 0),
+                                                      const EdgeInsetsDirectional
+                                                          .fromSTEB(4, 0, 0, 0),
                                                   child: Text(
-                                                    'Rs.',
-                                                    style: Get.textTheme
-                                                        .bodyText1!
+                                                    NumberFormat.simpleCurrency(name: 'INR').format(double.parse(member.plotTotalPrice ?? '0')),
+                                                    style: Get
+                                                        .textTheme.bodyText1!
                                                         .copyWith(
-                                                      fontFamily:
-                                                      'Lexend Deca',
-                                                      color: Get.theme
-                                                          .primaryColor,
+                                                      fontFamily: 'Lexend Deca',
+                                                      color: Get.textTheme
+                                                          .bodyText1!.color,
                                                       fontSize: 14,
                                                       fontWeight:
-                                                      FontWeight.w500,
-                                                    ),
-                                                  ),
-                                                ),
-                                                Padding(
-                                                  padding:
-                                                  const EdgeInsetsDirectional
-                                                      .fromSTEB(
-                                                      4, 0, 0, 0),
-                                                  child: Text(
-                                                    member.plotTotalPrice ??
-                                                        '',
-                                                    style: Get.textTheme
-                                                        .bodyText1!
-                                                        .copyWith(
-                                                      fontFamily:
-                                                      'Lexend Deca',
-                                                      color: Get.theme
-                                                          .primaryColor,
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                      FontWeight.w500,
+                                                          FontWeight.w500,
                                                     ),
                                                   ),
                                                 ),
@@ -364,8 +344,7 @@ class _UserslistWidgetState extends State<UserslistWidget> {
                                   ),
                                 ),
                                 Padding(
-                                  padding:
-                                  const EdgeInsetsDirectional.fromSTEB(
+                                  padding: const EdgeInsetsDirectional.fromSTEB(
                                       12, 4, 12, 4),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.max,
@@ -379,46 +358,24 @@ class _UserslistWidgetState extends State<UserslistWidget> {
                                           mainAxisSize: MainAxisSize.max,
                                           children: [
                                             Row(
-                                              mainAxisSize:
-                                              MainAxisSize.max,
+                                              mainAxisSize: MainAxisSize.max,
                                               children: [
+
                                                 Padding(
                                                   padding:
-                                                  const EdgeInsetsDirectional
-                                                      .fromSTEB(
-                                                      4, 0, 0, 0),
+                                                      const EdgeInsetsDirectional
+                                                          .fromSTEB(4, 0, 0, 0),
                                                   child: Text(
-                                                    'Rs.',
-                                                    style: Get.textTheme
-                                                        .bodyText1!
+                                                    NumberFormat.simpleCurrency(name: 'INR').format(double.parse(totalPaid.toString())),
+                                                    style: Get
+                                                        .textTheme.bodyText1!
                                                         .copyWith(
-                                                      fontFamily:
-                                                      'Lexend Deca',
-                                                      color: Get.theme
-                                                          .primaryColor,
+                                                      fontFamily: 'Lexend Deca',
+                                                      color: Get.textTheme
+                                                          .bodyText1!.color,
                                                       fontSize: 14,
                                                       fontWeight:
-                                                      FontWeight.w500,
-                                                    ),
-                                                  ),
-                                                ),
-                                                Padding(
-                                                  padding:
-                                                  const EdgeInsetsDirectional
-                                                      .fromSTEB(
-                                                      4, 0, 0, 0),
-                                                  child: Text(
-                                                    member.plotRate ?? '',
-                                                    style: Get.textTheme
-                                                        .bodyText1!
-                                                        .copyWith(
-                                                      fontFamily:
-                                                      'Lexend Deca',
-                                                      color: Get.theme
-                                                          .primaryColor,
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                      FontWeight.w500,
+                                                          FontWeight.w500,
                                                     ),
                                                   ),
                                                 ),
@@ -431,9 +388,8 @@ class _UserslistWidgetState extends State<UserslistWidget> {
                                   ),
                                 ),
                                 Padding(
-                                  padding:
-                                  const EdgeInsetsDirectional.fromSTEB(
-                                      12, 4, 12, 4),
+                                  padding: const EdgeInsetsDirectional.fromSTEB(
+                                      12, 4, 12, 12),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.max,
                                     children: [
@@ -446,46 +402,24 @@ class _UserslistWidgetState extends State<UserslistWidget> {
                                           mainAxisSize: MainAxisSize.max,
                                           children: [
                                             Row(
-                                              mainAxisSize:
-                                              MainAxisSize.max,
+                                              mainAxisSize: MainAxisSize.max,
                                               children: [
+
                                                 Padding(
                                                   padding:
-                                                  const EdgeInsetsDirectional
-                                                      .fromSTEB(
-                                                      4, 0, 0, 0),
+                                                      const EdgeInsetsDirectional
+                                                          .fromSTEB(4, 0, 0, 0),
                                                   child: Text(
-                                                    'Rs.',
-                                                    style: Get.textTheme
-                                                        .bodyText1!
+                                                    NumberFormat.simpleCurrency(name: 'INR').format(double.parse(totalDue.toString())),
+                                                    style: Get
+                                                        .textTheme.bodyText1!
                                                         .copyWith(
-                                                      fontFamily:
-                                                      'Lexend Deca',
+                                                      fontFamily: 'Lexend Deca',
                                                       color: Get.textTheme
                                                           .bodyText1!.color,
                                                       fontSize: 14,
                                                       fontWeight:
-                                                      FontWeight.w500,
-                                                    ),
-                                                  ),
-                                                ),
-                                                Padding(
-                                                  padding:
-                                                  const EdgeInsetsDirectional
-                                                      .fromSTEB(
-                                                      4, 0, 0, 0),
-                                                  child: Text(
-                                                    member.plotRate ?? '',
-                                                    style: Get.textTheme
-                                                        .bodyText1!
-                                                        .copyWith(
-                                                      fontFamily:
-                                                      'Lexend Deca',
-                                                      color: Get.textTheme
-                                                          .bodyText1!.color,
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                      FontWeight.w500,
+                                                          FontWeight.w500,
                                                     ),
                                                   ),
                                                 ),
@@ -500,9 +434,9 @@ class _UserslistWidgetState extends State<UserslistWidget> {
                               ],
                             ),
                           ),
-                        );
-                      },
-                    )
+                        ),
+                      );
+                    },
                   ),
                 ),
               ],
